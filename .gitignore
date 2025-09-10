@@ -1,0 +1,9 @@
+*~
+
+# from building with mock
+*.log
+
+# build artifacts
+*.rpm
+*.tar.bz2
+*.tar.gz

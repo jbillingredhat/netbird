@@ -1,0 +1,56 @@
+[archive]
+
+[licensing]
+detector = "askalono"
+exclude = [
+    "LICENSES/REUSE.toml"
+    ]
+
+[[licensing.licenses]]
+path = "vendor/github.com/shirou/gopsutil/v3/LICENSE"
+sha256sum = "ad1e64b82c04fb2ee6bfe521bff01266971ffaa70500024d4ac767c6033aafb9"
+expression = "BSD-3-Clause"
+
+[[licensing.licenses]]
+path = "vendor/github.com/go-text/typesetting/LICENSE"
+sha256sum = "6b1bf94c77d7faa0ce94f8745595bfaf4c404f8b3873f5c2ce55ca15f8e44eca"
+expression = "(Unlicense AND BSD-3-Clause AND (Unlicense OR BSD-3-Clause)) AND BSD-3-Clause AND Unlicense"
+
+[[licensing.licenses]]
+path = "vendor/github.com/cloudflare/circl/LICENSE"
+sha256sum = "b0da1764fe4d13d610b695536fc3f2ebc362482d053a1cd258e36975bc6b97a7"
+expression = "BSD-3-Clause"
+
+[[licensing.licenses]]
+path = "vendor/github.com/grpc-ecosystem/go-grpc-middleware/v2/COPYRIGHT"
+sha256sum = "8befb41eac649775143c81fddaf84b7d7e1197899d968b8b51cfec405f2ff72f"
+expression = "Apache-2.0"
+
+[[licensing.licenses]]
+path = "vendor/github.com/go-text/render/LICENSE"
+sha256sum = "6b1bf94c77d7faa0ce94f8745595bfaf4c404f8b3873f5c2ce55ca15f8e44eca"
+expression = "(Unlicense AND BSD-3-Clause AND (Unlicense OR BSD-3-Clause)) AND BSD-3-Clause AND Unlicense"
+
+[[licensing.licenses]]
+path = "vendor/gopkg.in/yaml.v3/LICENSE"
+sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
+expression = "MIT AND (MIT AND Apache-2.0)"
+
+[[licensing.licenses]]
+path = "vendor/github.com/miekg/dns/COPYRIGHT"
+sha256sum = "66550c0ad5ca7ec1e08683e5f872cc45c741f311eee3b8ee484206ecbf9c740d"
+expression = "BSD-3-Clause"
+
+[[licensing.licenses]]
+path = "vendor/github.com/jsummers/gobmp/readme.md"
+sha256sum = "614ff34279f126a2c6e42098b29aef9aa1e0003ec53dc6e98c3f2c017f4baa03"
+expression = "MIT"
+
+
+# This Go module was create with swagger-codegen against an API, and that
+# software is licensed here:
+# https://github.com/swagger-api/swagger-codegen/blob/master/LICENSE
+[[licensing.licenses]]
+path = "vendor/github.com/TheJumpCloud/jcapi-go/v1/README.md"
+sha256sum = "41c4c38b9c4ae1e376280bcdb4f5523c42dda50577ca83182389a88876e09ccb"
+expression = "Apache-2.0"
