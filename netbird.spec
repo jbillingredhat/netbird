@@ -27,7 +27,7 @@ Source0:        %{gosource}
 Source1:        %{archivename}-vendor.tar.bz2
 Source2:        go-vendor-tools.toml
 Source3:        netbird.service
-Source4:        client_default.json
+Source4:        client_config.json
 
 BuildRequires:  go-vendor-tools
 BuildRequires:  libX11-devel, libXcursor-devel, libXrandr-devel, libglvnd-devel, libXinerama-devel, libXi-devel, libXxf86vm-devel
@@ -91,7 +91,7 @@ install -m 0755 -vd %{buildroot}%{_sysconfdir}%{_localstatedir}/log/netbird
 
 # client configration
 install -m 0755 -vd %{buildroot}%{_sysconfdir}/netbird
-install -m 0755 -vp %{SOURCE4} %{buildroot}%{_sysconfdir}/netbird/default.json
+install -m 0755 -vp %{SOURCE4} %{buildroot}%{_sysconfdir}/netbird/config.json
 
 # Create hard links for all the duplicate license files
 hardlink --ignore-time %{buildroot}
@@ -120,9 +120,9 @@ hardlink --ignore-time %{buildroot}
 %{_bindir}/netbird
 %{_unitdir}/netbird.service
 %dir %{_sysconfdir}/netbird
-%config(noreplace) %{_sysconfdir}/netbird/default.json
+%config(noreplace) %{_sysconfdir}/netbird/config.json
 %ghost %config(noreplace) %{_sharedstatedir}/netbird/default.json
-%ghost %{_localstatedir}/netbird/client.log
+%ghost %{_localstatedir}/log/netbird/client.log
 %ghost %{_rundir}/netbird.sock
 
 %files ui
