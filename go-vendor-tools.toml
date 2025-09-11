@@ -2,7 +2,7 @@
 
 [licensing]
 detector = "askalono"
-exclude = [
+exclude_files = [
     "LICENSES/REUSE.toml"
     ]
 
@@ -45,12 +45,3 @@ expression = "BSD-3-Clause"
 path = "vendor/github.com/jsummers/gobmp/readme.md"
 sha256sum = "614ff34279f126a2c6e42098b29aef9aa1e0003ec53dc6e98c3f2c017f4baa03"
 expression = "MIT"
-
-
-# This Go module was create with swagger-codegen against an API, and that
-# software is licensed here:
-# https://github.com/swagger-api/swagger-codegen/blob/master/LICENSE
-[[licensing.licenses]]
-path = "vendor/github.com/TheJumpCloud/jcapi-go/v1/README.md"
-sha256sum = "41c4c38b9c4ae1e376280bcdb4f5523c42dda50577ca83182389a88876e09ccb"
-expression = "Apache-2.0"

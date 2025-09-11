@@ -1,0 +1,13 @@
+diff -Naur vendor.old/modules.txt vendor/modules.txt
+--- a/vendor/modules.txt	1969-12-31 19:00:00.000000000 -0500
++++ b/vendor/modules.txt	2025-09-10 16:04:56.380285398 -0400
+@@ -103,9 +103,6 @@
+ # github.com/Microsoft/hcsshim v0.12.3
+ ## explicit; go 1.21
+ github.com/Microsoft/hcsshim/osversion
+-# github.com/TheJumpCloud/jcapi-go v3.0.0+incompatible
+-## explicit
+-github.com/TheJumpCloud/jcapi-go/v1
+ # github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be
+ ## explicit; go 1.13
+ github.com/anmitsu/go-shlex

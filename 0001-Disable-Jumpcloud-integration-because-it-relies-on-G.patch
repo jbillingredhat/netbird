@@ -1,0 +1,375 @@
+From e9c32902b3c8e9262bca850e8ff8f50e74cfd970 Mon Sep 17 00:00:00 2001
+From: Jonathan Billings <jbilling@redhat.com>
+Date: Wed, 10 Sep 2025 16:02:20 -0400
+Subject: [PATCH] Disable Jumpcloud integration because it relies on Go module
+ with no open source license
+
+---
+ go.mod                                  |   1 -
+ go.sum                                  |   2 -
+ management/server/idp/idp.go            |   5 -
+ management/server/idp/jumpcloud.go      | 257 ------------------------
+ management/server/idp/jumpcloud_test.go |  46 -----
+ 5 files changed, 311 deletions(-)
+ delete mode 100644 management/server/idp/jumpcloud.go
+ delete mode 100644 management/server/idp/jumpcloud_test.go
+
+diff --git a/go.mod b/go.mod
+index 70e52875..01b24199 100644
+--- a/go.mod
++++ b/go.mod
+@@ -30,7 +30,6 @@ require (
+ require (
+ 	fyne.io/fyne/v2 v2.5.3
+ 	fyne.io/systray v1.11.0
+-	github.com/TheJumpCloud/jcapi-go v3.0.0+incompatible
+ 	github.com/aws/aws-sdk-go-v2 v1.36.3
+ 	github.com/aws/aws-sdk-go-v2/config v1.29.14
+ 	github.com/aws/aws-sdk-go-v2/service/s3 v1.79.2
+diff --git a/go.sum b/go.sum
+index 3fdef5d0..dc00cfe4 100644
+--- a/go.sum
++++ b/go.sum
+@@ -66,8 +66,6 @@ github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERo
+ github.com/Microsoft/go-winio v0.6.2/go.mod h1:yd8OoFMLzJbo9gZq8j5qaps8bJ9aShtEA8Ipt1oGCvU=
+ github.com/Microsoft/hcsshim v0.12.3 h1:LS9NXqXhMoqNCplK1ApmVSfB4UnVLRDWRapB6EIlxE0=
+ github.com/Microsoft/hcsshim v0.12.3/go.mod h1:Iyl1WVpZzr+UkzjekHZbV8o5Z9ZkxNGx6CtY2Qg/JVQ=
+-github.com/TheJumpCloud/jcapi-go v3.0.0+incompatible h1:hqcTK6ZISdip65SR792lwYJTa/axESA0889D3UlZbLo=
+-github.com/TheJumpCloud/jcapi-go v3.0.0+incompatible/go.mod h1:6B1nuc1MUs6c62ODZDl7hVE5Pv7O2XGSkgg2olnq34I=
+ github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be h1:9AeTilPcZAjCFIImctFaOjnTIavg87rW78vTPkQqLI8=
+ github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be/go.mod h1:ySMOLuWl6zY27l47sB3qLNK6tF2fkHG55UZxx8oIVo4=
+ github.com/antihax/optional v1.0.0/go.mod h1:uupD/76wgC+ih3iEmQUL+0Ugr19nfwCT1kdvxnR2qWY=
+diff --git a/management/server/idp/idp.go b/management/server/idp/idp.go
+index 51f99b3b..9242f103 100644
+--- a/management/server/idp/idp.go
++++ b/management/server/idp/idp.go
+@@ -196,11 +196,6 @@ func NewManager(ctx context.Context, config Config, appMetrics telemetry.AppMetr
+ 			CustomerID:        config.ExtraConfig["CustomerId"],
+ 		}
+ 		return NewGoogleWorkspaceManager(ctx, googleClientConfig, appMetrics)
+-	case "jumpcloud":
+-		jumpcloudConfig := JumpCloudClientConfig{
+-			APIToken: config.ExtraConfig["ApiToken"],
+-		}
+-		return NewJumpCloudManager(jumpcloudConfig, appMetrics)
+ 	default:
+ 		return nil, fmt.Errorf("invalid manager type: %s", config.ManagerType)
+ 	}
+diff --git a/management/server/idp/jumpcloud.go b/management/server/idp/jumpcloud.go
+deleted file mode 100644
+index 6345e424..00000000
+--- a/management/server/idp/jumpcloud.go
++++ /dev/null
+@@ -1,257 +0,0 @@
+-package idp
+-
+-import (
+-	"context"
+-	"fmt"
+-	"net/http"
+-	"strings"
+-	"time"
+-
+-	v1 "github.com/TheJumpCloud/jcapi-go/v1"
+-
+-	"github.com/netbirdio/netbird/management/server/telemetry"
+-)
+-
+-const (
+-	contentType = "application/json"
+-	accept      = "application/json"
+-)
+-
+-// JumpCloudManager JumpCloud manager client instance.
+-type JumpCloudManager struct {
+-	client      *v1.APIClient
+-	apiToken    string
+-	httpClient  ManagerHTTPClient
+-	credentials ManagerCredentials
+-	helper      ManagerHelper
+-	appMetrics  telemetry.AppMetrics
+-}
+-
+-// JumpCloudClientConfig JumpCloud manager client configurations.
+-type JumpCloudClientConfig struct {
+-	APIToken string
+-}
+-
+-// JumpCloudCredentials JumpCloud authentication information.
+-type JumpCloudCredentials struct {
+-	clientConfig JumpCloudClientConfig
+-	helper       ManagerHelper
+-	httpClient   ManagerHTTPClient
+-	appMetrics   telemetry.AppMetrics
+-}
+-
+-// NewJumpCloudManager creates a new instance of the JumpCloudManager.
+-func NewJumpCloudManager(config JumpCloudClientConfig, appMetrics telemetry.AppMetrics) (*JumpCloudManager, error) {
+-	httpTransport := http.DefaultTransport.(*http.Transport).Clone()
+-	httpTransport.MaxIdleConns = 5
+-
+-	httpClient := &http.Client{
+-		Timeout:   10 * time.Second,
+-		Transport: httpTransport,
+-	}
+-	helper := JsonParser{}
+-
+-	if config.APIToken == "" {
+-		return nil, fmt.Errorf("jumpCloud IdP configuration is incomplete, ApiToken is missing")
+-	}
+-
+-	client := v1.NewAPIClient(v1.NewConfiguration())
+-	credentials := &JumpCloudCredentials{
+-		clientConfig: config,
+-		httpClient:   httpClient,
+-		helper:       helper,
+-		appMetrics:   appMetrics,
+-	}
+-
+-	return &JumpCloudManager{
+-		client:      client,
+-		apiToken:    config.APIToken,
+-		httpClient:  httpClient,
+-		credentials: credentials,
+-		helper:      helper,
+-		appMetrics:  appMetrics,
+-	}, nil
+-}
+-
+-// Authenticate retrieves access token to use the JumpCloud user API.
+-func (jc *JumpCloudCredentials) Authenticate(_ context.Context) (JWTToken, error) {
+-	return JWTToken{}, nil
+-}
+-
+-func (jm *JumpCloudManager) authenticationContext() context.Context {
+-	return context.WithValue(context.Background(), v1.ContextAPIKey, v1.APIKey{
+-		Key: jm.apiToken,
+-	})
+-}
+-
+-// UpdateUserAppMetadata updates user app metadata based on userID and metadata map.
+-func (jm *JumpCloudManager) UpdateUserAppMetadata(_ context.Context, _ string, _ AppMetadata) error {
+-	return nil
+-}
+-
+-// GetUserDataByID requests user data from JumpCloud via ID.
+-func (jm *JumpCloudManager) GetUserDataByID(_ context.Context, userID string, appMetadata AppMetadata) (*UserData, error) {
+-	authCtx := jm.authenticationContext()
+-	user, resp, err := jm.client.SystemusersApi.SystemusersGet(authCtx, userID, contentType, accept, nil)
+-	if err != nil {
+-		return nil, err
+-	}
+-	defer resp.Body.Close()
+-
+-	if resp.StatusCode != http.StatusOK {
+-		if jm.appMetrics != nil {
+-			jm.appMetrics.IDPMetrics().CountRequestStatusError()
+-		}
+-		return nil, fmt.Errorf("unable to get user %s, statusCode %d", userID, resp.StatusCode)
+-	}
+-
+-	if jm.appMetrics != nil {
+-		jm.appMetrics.IDPMetrics().CountGetUserDataByID()
+-	}
+-
+-	userData := parseJumpCloudUser(user)
+-	userData.AppMetadata = appMetadata
+-
+-	return userData, nil
+-}
+-
+-// GetAccount returns all the users for a given profile.
+-func (jm *JumpCloudManager) GetAccount(_ context.Context, accountID string) ([]*UserData, error) {
+-	authCtx := jm.authenticationContext()
+-	userList, resp, err := jm.client.SearchApi.SearchSystemusersPost(authCtx, contentType, accept, nil)
+-	if err != nil {
+-		return nil, err
+-	}
+-	defer resp.Body.Close()
+-
+-	if resp.StatusCode != http.StatusOK {
+-		if jm.appMetrics != nil {
+-			jm.appMetrics.IDPMetrics().CountRequestStatusError()
+-		}
+-		return nil, fmt.Errorf("unable to get account %s users, statusCode %d", accountID, resp.StatusCode)
+-	}
+-
+-	if jm.appMetrics != nil {
+-		jm.appMetrics.IDPMetrics().CountGetAccount()
+-	}
+-
+-	users := make([]*UserData, 0)
+-	for _, user := range userList.Results {
+-		userData := parseJumpCloudUser(user)
+-		userData.AppMetadata.WTAccountID = accountID
+-
+-		users = append(users, userData)
+-	}
+-
+-	return users, nil
+-}
+-
+-// GetAllAccounts gets all registered accounts with corresponding user data.
+-// It returns a list of users indexed by accountID.
+-func (jm *JumpCloudManager) GetAllAccounts(_ context.Context) (map[string][]*UserData, error) {
+-	authCtx := jm.authenticationContext()
+-	userList, resp, err := jm.client.SearchApi.SearchSystemusersPost(authCtx, contentType, accept, nil)
+-	if err != nil {
+-		return nil, err
+-	}
+-	defer resp.Body.Close()
+-
+-	if resp.StatusCode != http.StatusOK {
+-		if jm.appMetrics != nil {
+-			jm.appMetrics.IDPMetrics().CountRequestStatusError()
+-		}
+-		return nil, fmt.Errorf("unable to get all accounts, statusCode %d", resp.StatusCode)
+-	}
+-
+-	if jm.appMetrics != nil {
+-		jm.appMetrics.IDPMetrics().CountGetAllAccounts()
+-	}
+-
+-	indexedUsers := make(map[string][]*UserData)
+-	for _, user := range userList.Results {
+-		userData := parseJumpCloudUser(user)
+-		indexedUsers[UnsetAccountID] = append(indexedUsers[UnsetAccountID], userData)
+-	}
+-
+-	return indexedUsers, nil
+-}
+-
+-// CreateUser creates a new user in JumpCloud Idp and sends an invitation.
+-func (jm *JumpCloudManager) CreateUser(_ context.Context, _, _, _, _ string) (*UserData, error) {
+-	return nil, fmt.Errorf("method CreateUser not implemented")
+-}
+-
+-// GetUserByEmail searches users with a given email.
+-// If no users have been found, this function returns an empty list.
+-func (jm *JumpCloudManager) GetUserByEmail(_ context.Context, email string) ([]*UserData, error) {
+-	searchFilter := map[string]interface{}{
+-		"searchFilter": map[string]interface{}{
+-			"filter": []string{email},
+-			"fields": []string{"email"},
+-		},
+-	}
+-
+-	authCtx := jm.authenticationContext()
+-	userList, resp, err := jm.client.SearchApi.SearchSystemusersPost(authCtx, contentType, accept, searchFilter)
+-	if err != nil {
+-		return nil, err
+-	}
+-	defer resp.Body.Close()
+-
+-	if resp.StatusCode != http.StatusOK {
+-		if jm.appMetrics != nil {
+-			jm.appMetrics.IDPMetrics().CountRequestStatusError()
+-		}
+-		return nil, fmt.Errorf("unable to get user %s, statusCode %d", email, resp.StatusCode)
+-	}
+-
+-	if jm.appMetrics != nil {
+-		jm.appMetrics.IDPMetrics().CountGetUserByEmail()
+-	}
+-
+-	usersData := make([]*UserData, 0)
+-	for _, user := range userList.Results {
+-		usersData = append(usersData, parseJumpCloudUser(user))
+-	}
+-
+-	return usersData, nil
+-}
+-
+-// InviteUserByID resend invitations to users who haven't activated,
+-// their accounts prior to the expiration period.
+-func (jm *JumpCloudManager) InviteUserByID(_ context.Context, _ string) error {
+-	return fmt.Errorf("method InviteUserByID not implemented")
+-}
+-
+-// DeleteUser from jumpCloud directory
+-func (jm *JumpCloudManager) DeleteUser(_ context.Context, userID string) error {
+-	authCtx := jm.authenticationContext()
+-	_, resp, err := jm.client.SystemusersApi.SystemusersDelete(authCtx, userID, contentType, accept, nil)
+-	if err != nil {
+-		return err
+-	}
+-	defer resp.Body.Close()
+-
+-	if resp.StatusCode != http.StatusOK {
+-		if jm.appMetrics != nil {
+-			jm.appMetrics.IDPMetrics().CountRequestStatusError()
+-		}
+-		return fmt.Errorf("unable to delete user, statusCode %d", resp.StatusCode)
+-	}
+-
+-	if jm.appMetrics != nil {
+-		jm.appMetrics.IDPMetrics().CountDeleteUser()
+-	}
+-
+-	return nil
+-}
+-
+-// parseJumpCloudUser parse JumpCloud system user returned from API V1 to UserData.
+-func parseJumpCloudUser(user v1.Systemuserreturn) *UserData {
+-	names := []string{user.Firstname, user.Middlename, user.Lastname}
+-	return &UserData{
+-		Email: user.Email,
+-		Name:  strings.Join(names, " "),
+-		ID:    user.Id,
+-	}
+-}
+diff --git a/management/server/idp/jumpcloud_test.go b/management/server/idp/jumpcloud_test.go
+deleted file mode 100644
+index 1bfdcefc..00000000
+--- a/management/server/idp/jumpcloud_test.go
++++ /dev/null
+@@ -1,46 +0,0 @@
+-package idp
+-
+-import (
+-	"testing"
+-
+-	"github.com/stretchr/testify/require"
+-
+-	"github.com/netbirdio/netbird/management/server/telemetry"
+-)
+-
+-func TestNewJumpCloudManager(t *testing.T) {
+-	type test struct {
+-		name                 string
+-		inputConfig          JumpCloudClientConfig
+-		assertErrFunc        require.ErrorAssertionFunc
+-		assertErrFuncMessage string
+-	}
+-
+-	defaultTestConfig := JumpCloudClientConfig{
+-		APIToken: "test123",
+-	}
+-
+-	testCase1 := test{
+-		name:                 "Good Configuration",
+-		inputConfig:          defaultTestConfig,
+-		assertErrFunc:        require.NoError,
+-		assertErrFuncMessage: "shouldn't return error",
+-	}
+-
+-	testCase2Config := defaultTestConfig
+-	testCase2Config.APIToken = ""
+-
+-	testCase2 := test{
+-		name:                 "Missing APIToken Configuration",
+-		inputConfig:          testCase2Config,
+-		assertErrFunc:        require.Error,
+-		assertErrFuncMessage: "should return error when field empty",
+-	}
+-
+-	for _, testCase := range []test{testCase1, testCase2} {
+-		t.Run(testCase.name, func(t *testing.T) {
+-			_, err := NewJumpCloudManager(testCase.inputConfig, &telemetry.MockAppMetrics{})
+-			testCase.assertErrFunc(t, err, testCase.assertErrFuncMessage)
+-		})
+-	}
+-}
+-- 
+2.51.0
+
