@@ -1,5 +1,5 @@
 srpm:
-	dnf install -y rpmdevtools go-vendor-tools
+	dnf install -y rpmdevtools go-vendor-tools python3-specfile
 	rm -rf /tmp/_topdir
 	mkdir -p /tmp/_topdir/SOURCES
 	go_vendor_archive create --config go-vendor-tools.toml netbird.spec
