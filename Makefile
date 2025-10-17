@@ -1,5 +1,5 @@
 srpm:
-	dnf install -y rpmdevtools go-vendor-tools python3-specfile
+	dnf install -y rpmdevtools go-vendor-tools python3-specfile golang-bin
 	rm -rf /tmp/_topdir
 	mkdir -p /tmp/_topdir/SOURCES
 	rpmdev-spectool --gf $(spec)
