@@ -2,7 +2,7 @@ srpm:
 	dnf install -y rpmdevtools go-vendor-tools python3-specfile
 	rm -rf /tmp/_topdir
 	mkdir -p /tmp/_topdir/SOURCES
-	rpmdev-spectool --gf -R $(spec)
+	rpmdev-spectool --gf $(spec)
 	go_vendor_archive create --config go-vendor-tools.toml netbird.spec
 	cp netbird*.tar.gz netbird*.tar.bz2 go-vendor-tools.toml *.patch netbird.service client_config.json /tmp/_topdir/SOURCES/
 	rpmbuild -bs --define "_topdir /tmp/_topdir" $(spec)
