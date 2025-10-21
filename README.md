@@ -23,9 +23,18 @@
 ```
 A .src.rpm package will be created.  You can then build that with rpmbuild or mock.
 
+## How to use Netbird
+
+Please follow the [Netbird Documentation](https://docs.netbird.io/).  The only difference with this package is that it is built using the Fedora Golang packages, and that you have to manually enable and start the `netbird.service` Systemd service.
+
+
+## How can I preconfigure Netbird to always use my self-hosted service?
+
+There is a commented out example configuration in /etc/netbird/config.json.  Setting the ManagementURL to your self-hosted endpoint will be used by default when creating a new profile.  
+
 ## Why build native packages?
 
-The netbird packages provided by the company Netbird (GmbH) uses [nFPM](https://github.com/goreleaser/nfpm) to package the RPMs, which results in a subpar package.  Some of the things we avoid with the native Fedora package are:
+The netbird packages provided by the company [Netbird (GmbH)](https://netbird.io/about) uses [nFPM](https://github.com/goreleaser/nfpm) to package the RPMs, which results in a subpar package.  Some of the things we avoid with the native Fedora package are:
 
 - The netbird packages will not attempt to run commands as the user as part of the post script.
 - Uses the standard systemd macros for the %post, %prun, and %postun package.
