@@ -29,7 +29,11 @@ Source1:        %{archivename}-vendor.tar.bz2
 Source2:        go-vendor-tools.toml
 Source3:        netbird.service
 Source4:        client_config.json
+# Patch out the Jumpcloud integration from the server code. Does not impact
+# the client, but since it is not included in the vendor tarball, it will
+# impact building the software
 Patch00:        0001-Disable-Jumpcloud-integration-because-it-relies-on-G.patch
+# Remove TheJumpCloud/jcapi-go module from the go.mod.
 Patch01:        vendor-remove-TheJumpCloud-jcapi-go.patch
 
 BuildRequires:  go-vendor-tools
@@ -69,6 +73,8 @@ The graphical client used to run and manage your netbird connection.
 
 %build
 %global gomodulesmode GO111MODULE=on
+# LD Flags stolen from the upstream vendor's build command, changed to say
+# that it was built by Red Hat IT
 LDFLAGS="-s -w -X github.com/netbirdio/netbird/version.version=%{version} -X main.commit=%{tag} -X main.builtBy=redhatit"
 for cmd in client client/ui; do
   %gobuild -o %{gobuilddir}/bin/$(basename $cmd) %{goipath}/$cmd
@@ -124,8 +130,10 @@ hardlink --ignore-time %{buildroot}
 %{_bindir}/netbird
 %{_unitdir}/netbird.service
 %dir %{_sysconfdir}/netbird
+%dir %{_sharedstatedir}/netbird
 %config(noreplace) %{_sysconfdir}/netbird/config.json
-%ghost %config(noreplace) %{_sharedstatedir}/netbird/default.json
+%ghost %config(noreplace) %{_sharedstatedir}/netbird/active_profile.json
+%ghost %config(noreplace) %{_sharedstatedir}/netbird/state.json
 %ghost %{_localstatedir}/log/netbird/client.log
 %ghost %{_rundir}/netbird.sock
 
