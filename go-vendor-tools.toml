@@ -1,4 +1,7 @@
 [archive]
+post_commands = [
+    ["rm", "-rf", "vendor/github.com/TheJumpCloud"],
+]
 
 [licensing]
 detector = "askalono"
