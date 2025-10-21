@@ -1,4 +1,4 @@
-[![COPR Build status](https://copr.fedorainfracloud.org/coprs/jsbillings/netbird/package/netbird/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/jsbillings/netbird/)
+[![Copr build status](https://copr.fedorainfracloud.org/coprs/jsbillings/netbird/package/netbird/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/jsbillings/netbird/package/netbird/)
 
 # Packaging netbird as a native Fedora Package
 
