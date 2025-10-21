@@ -30,7 +30,7 @@ Please follow the [Netbird Documentation](https://docs.netbird.io/).  The only d
 
 ## How can I preconfigure Netbird to always use my self-hosted service?
 
-There is a commented out example configuration in /etc/netbird/config.json.  Setting the ManagementURL to your self-hosted endpoint will be used by default when creating a new profile.  
+There is a [commented out example configuration](./client_config.json) in /etc/netbird/config.json.  Setting the ManagementURL to your self-hosted endpoint will be used by default when creating a new profile.  
 
 ## Why build native packages?
 
