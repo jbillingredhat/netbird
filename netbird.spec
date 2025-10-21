@@ -83,6 +83,7 @@ done
 %install
 %go_vendor_license_install -c %{SOURCE2}
 install -m 0755 -vd %{buildroot}%{_bindir}
+
 install -m 0755 -vp %{gobuilddir}/bin/client %{buildroot}%{_bindir}/netbird
 install -m 0755 -vp %{gobuilddir}/bin/ui %{buildroot}%{_bindir}/netbird-ui
 
@@ -95,6 +96,7 @@ install -m 0755 -vp client/ui/assets/netbird.png %{buildroot}%{_datarootdir}/ico
 # systemd service
 install -m 0755 -vd %{buildroot}%{_unitdir}
 install -m 0755 -vp %{SOURCE3} %{buildroot}%{_unitdir}/netbird.service
+install -m 0755 -vd %{buildroot}%{_sharedstatedir}/netbird
 
 # log directory
 install -m 0755 -vd %{buildroot}%{_sysconfdir}%{_localstatedir}/log/netbird
