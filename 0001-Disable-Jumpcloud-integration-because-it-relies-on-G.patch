@@ -1,4 +1,4 @@
-From e9c32902b3c8e9262bca850e8ff8f50e74cfd970 Mon Sep 17 00:00:00 2001
+From ecc290884b7ea7341833e826f047fcd0c8339946 Mon Sep 17 00:00:00 2001
 From: Jonathan Billings <jbilling@redhat.com>
 Date: Wed, 10 Sep 2025 16:02:20 -0400
 Subject: [PATCH] Disable Jumpcloud integration because it relies on Go module
@@ -15,7 +15,7 @@ Subject: [PATCH] Disable Jumpcloud integration because it relies on Go module
  delete mode 100644 management/server/idp/jumpcloud_test.go
 
 diff --git a/go.mod b/go.mod
-index 70e52875..01b24199 100644
+index 31b45e88..0d73c227 100644
 --- a/go.mod
 +++ b/go.mod
 @@ -30,7 +30,6 @@ require (
@@ -27,7 +27,7 @@ index 70e52875..01b24199 100644
  	github.com/aws/aws-sdk-go-v2/config v1.29.14
  	github.com/aws/aws-sdk-go-v2/service/s3 v1.79.2
 diff --git a/go.sum b/go.sum
-index 3fdef5d0..dc00cfe4 100644
+index 6b0b298a..eb36907b 100644
 --- a/go.sum
 +++ b/go.sum
 @@ -66,8 +66,6 @@ github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERo
@@ -40,7 +40,7 @@ index 3fdef5d0..dc00cfe4 100644
  github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be/go.mod h1:ySMOLuWl6zY27l47sB3qLNK6tF2fkHG55UZxx8oIVo4=
  github.com/antihax/optional v1.0.0/go.mod h1:uupD/76wgC+ih3iEmQUL+0Ugr19nfwCT1kdvxnR2qWY=
 diff --git a/management/server/idp/idp.go b/management/server/idp/idp.go
-index 51f99b3b..9242f103 100644
+index f06e5719..52fc656d 100644
 --- a/management/server/idp/idp.go
 +++ b/management/server/idp/idp.go
 @@ -196,11 +196,6 @@ func NewManager(ctx context.Context, config Config, appMetrics telemetry.AppMetr
@@ -52,9 +52,9 @@ index 51f99b3b..9242f103 100644
 -			APIToken: config.ExtraConfig["ApiToken"],
 -		}
 -		return NewJumpCloudManager(jumpcloudConfig, appMetrics)
- 	default:
- 		return nil, fmt.Errorf("invalid manager type: %s", config.ManagerType)
- 	}
+ 	case "pocketid":
+ 		pocketidConfig := PocketIdClientConfig{
+ 			APIToken:           config.ExtraConfig["ApiToken"],
 diff --git a/management/server/idp/jumpcloud.go b/management/server/idp/jumpcloud.go
 deleted file mode 100644
 index 6345e424..00000000
