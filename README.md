@@ -36,7 +36,8 @@ There is a commented out example configuration in /etc/netbird/config.json.  Set
 
 The netbird packages provided by the company [Netbird (GmbH)](https://netbird.io/about) uses [nFPM](https://github.com/goreleaser/nfpm) to package the RPMs, which results in a subpar package.  Some of the things we avoid with the native Fedora package are:
 
-- The netbird packages will not attempt to run commands as the user as part of the post script.
+- The netbird-ui package will not [attempt to run commands as the user](https://github.com/netbirdio/netbird/blob/main/release_files/ui-post-install.sh) as part of the post script.
+- The netbird-client does not [start the systemd service upon installing the package](https://github.com/netbirdio/netbird/blob/main/release_files/post_install.sh).
 - Uses the standard systemd macros for the %post, %prun, and %postun package.
 - Separates out a -client and -ui package.
 - Actually properly attributes all the licenses used to build the client.
