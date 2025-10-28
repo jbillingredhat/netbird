@@ -126,7 +126,6 @@ hardlink --ignore-time %{buildroot}
 %license vendor/modules.txt
 %doc docs AUTHORS CODE_OF_CONDUCT.md CONTRIBUTING.md
 %doc CONTRIBUTOR_LICENSE_AGREEMENT.md README.md SECURITY.md
-%doc client/iface/mocks/README.md
 
 %files client
 %{_bindir}/netbird
