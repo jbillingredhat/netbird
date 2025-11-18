@@ -11,8 +11,8 @@
 
 # https://github.com/netbirdio/netbird
 %global goipath         github.com/netbirdio/netbird
-Version:                0.59.12
-%global tag             v0.59.12
+%global netbirdversion  0.60.0
+Version:                %{netbirdversion}
 
 %gometa -L -f
 
@@ -75,7 +75,7 @@ The graphical client used to run and manage your netbird connection.
 %global gomodulesmode GO111MODULE=on
 # LD Flags stolen from the upstream vendor's build command, changed to say
 # that it was built by Red Hat IT
-LDFLAGS="-s -w -X github.com/netbirdio/netbird/version.version=%{version} -X main.commit=%{tag} -X main.builtBy=redhatit"
+LDFLAGS="-s -w -X github.com/netbirdio/netbird/version.version=%{version} -X main.commit=v%{netbirdversion} -X main.builtBy=redhatit"
 for cmd in client client/ui; do
   %gobuild -o %{gobuilddir}/bin/$(basename $cmd) %{goipath}/$cmd
 done

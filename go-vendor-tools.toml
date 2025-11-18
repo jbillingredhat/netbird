@@ -45,6 +45,6 @@ sha256sum = "66550c0ad5ca7ec1e08683e5f872cc45c741f311eee3b8ee484206ecbf9c740d"
 expression = "BSD-3-Clause"
 
 [[licensing.licenses]]
-path = "vendor/github.com/jsummers/gobmp/readme.md"
-sha256sum = "614ff34279f126a2c6e42098b29aef9aa1e0003ec53dc6e98c3f2c017f4baa03"
+path = "vendor/github.com/jsummers/gobmp/COPYING.txt"
+sha256sum = "027529c1f33b6ef9280c5b9569e120734dbbee0e5e37436fb9a1bc7a0153b0ae"
 expression = "MIT"
