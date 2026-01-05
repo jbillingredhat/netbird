@@ -1,4 +1,4 @@
-From 7ed80417939a8bf895a1ba085f29ca224460598b Mon Sep 17 00:00:00 2001
+From c9352c74fe01b4080740c362dc149ec5ab2bb5ed Mon Sep 17 00:00:00 2001
 From: Jonathan Billings <jbilling@redhat.com>
 Date: Wed, 10 Sep 2025 16:02:20 -0400
 Subject: [PATCH] Disable Jumpcloud integration because it relies on Go module
@@ -7,15 +7,15 @@ Subject: [PATCH] Disable Jumpcloud integration because it relies on Go module
 ---
  go.mod                                  |   1 -
  go.sum                                  |   2 -
- management/server/idp/idp.go            |   5 -
+ management/server/idp/idp.go            |   4 -
  management/server/idp/jumpcloud.go      | 257 ------------------------
  management/server/idp/jumpcloud_test.go |  46 -----
- 5 files changed, 311 deletions(-)
+ 5 files changed, 310 deletions(-)
  delete mode 100644 management/server/idp/jumpcloud.go
  delete mode 100644 management/server/idp/jumpcloud_test.go
 
 diff --git a/go.mod b/go.mod
-index 45a36190..4b15fb87 100644
+index e52f21e5..7c6e3c3c 100644
 --- a/go.mod
 +++ b/go.mod
 @@ -30,7 +30,6 @@ require (
@@ -27,7 +27,7 @@ index 45a36190..4b15fb87 100644
  	github.com/aws/aws-sdk-go-v2 v1.36.3
  	github.com/aws/aws-sdk-go-v2/config v1.29.14
 diff --git a/go.sum b/go.sum
-index ec68a8f5..35a78b8b 100644
+index b362d75e..9e83d4b2 100644
 --- a/go.sum
 +++ b/go.sum
 @@ -27,8 +27,6 @@ github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERo
@@ -40,20 +40,19 @@ index ec68a8f5..35a78b8b 100644
  github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be/go.mod h1:ySMOLuWl6zY27l47sB3qLNK6tF2fkHG55UZxx8oIVo4=
  github.com/awnumar/memcall v0.4.0 h1:B7hgZYdfH6Ot1Goaz8jGne/7i8xD4taZie/PNSFZ29g=
 diff --git a/management/server/idp/idp.go b/management/server/idp/idp.go
-index f06e5719..52fc656d 100644
+index 4aad674d..54008e29 100644
 --- a/management/server/idp/idp.go
 +++ b/management/server/idp/idp.go
-@@ -196,11 +196,6 @@ func NewManager(ctx context.Context, config Config, appMetrics telemetry.AppMetr
+@@ -193,10 +193,6 @@ func NewManager(ctx context.Context, config Config, appMetrics telemetry.AppMetr
+ 			ServiceAccountKey: config.ExtraConfig["ServiceAccountKey"],
  			CustomerID:        config.ExtraConfig["CustomerId"],
- 		}
- 		return NewGoogleWorkspaceManager(ctx, googleClientConfig, appMetrics)
+ 		}, appMetrics)
 -	case "jumpcloud":
--		jumpcloudConfig := JumpCloudClientConfig{
+-		return NewJumpCloudManager(JumpCloudClientConfig{
 -			APIToken: config.ExtraConfig["ApiToken"],
--		}
--		return NewJumpCloudManager(jumpcloudConfig, appMetrics)
+-		}, appMetrics)
  	case "pocketid":
- 		pocketidConfig := PocketIdClientConfig{
+ 		return NewPocketIdManager(PocketIdClientConfig{
  			APIToken:           config.ExtraConfig["ApiToken"],
 diff --git a/management/server/idp/jumpcloud.go b/management/server/idp/jumpcloud.go
 deleted file mode 100644
@@ -371,5 +370,5 @@ index 1bfdcefc..00000000
 -	}
 -}
 -- 
-2.51.1
+2.52.0
 
