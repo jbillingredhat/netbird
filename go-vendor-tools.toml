@@ -48,3 +48,9 @@ expression = "BSD-3-Clause"
 path = "vendor/github.com/jsummers/gobmp/COPYING.txt"
 sha256sum = "027529c1f33b6ef9280c5b9569e120734dbbee0e5e37436fb9a1bc7a0153b0ae"
 expression = "MIT"
+
+[[licensing.licenses]]
+path = "vendor/github.com/shopspring/decimal/LICENSE"
+sha256sum = "b92ba0f6ee02f2309628bfdadb123668a17c016e475ba477b857d33470d9d625"
+expression = "MIT"
+
