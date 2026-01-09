@@ -1,24 +1,22 @@
-From c9352c74fe01b4080740c362dc149ec5ab2bb5ed Mon Sep 17 00:00:00 2001
+From ecc1221f5d4ca0bbbfec46d36ca6a51e5821be73 Mon Sep 17 00:00:00 2001
 From: Jonathan Billings <jbilling@redhat.com>
 Date: Wed, 10 Sep 2025 16:02:20 -0400
 Subject: [PATCH] Disable Jumpcloud integration because it relies on Go module
  with no open source license
 
 ---
- go.mod                                  |   1 -
- go.sum                                  |   2 -
- management/server/idp/idp.go            |   4 -
- management/server/idp/jumpcloud.go      | 257 ------------------------
- management/server/idp/jumpcloud_test.go |  46 -----
- 5 files changed, 310 deletions(-)
+ go.mod                             |   1 -
+ go.sum                             |   2 -
+ management/server/idp/idp.go       |   4 -
+ management/server/idp/jumpcloud.go | 257 -----------------------------
+ 4 files changed, 264 deletions(-)
  delete mode 100644 management/server/idp/jumpcloud.go
- delete mode 100644 management/server/idp/jumpcloud_test.go
 
 diff --git a/go.mod b/go.mod
-index e52f21e5..7c6e3c3c 100644
+index cf55b926..0a2a2317 100644
 --- a/go.mod
 +++ b/go.mod
-@@ -30,7 +30,6 @@ require (
+@@ -32,7 +32,6 @@ require (
  require (
  	fyne.io/fyne/v2 v2.7.0
  	fyne.io/systray v1.11.1-0.20250603113521-ca66a66d8b58
@@ -27,23 +25,23 @@ index e52f21e5..7c6e3c3c 100644
  	github.com/aws/aws-sdk-go-v2 v1.36.3
  	github.com/aws/aws-sdk-go-v2/config v1.29.14
 diff --git a/go.sum b/go.sum
-index b362d75e..9e83d4b2 100644
+index e89e0ef1..05a526d7 100644
 --- a/go.sum
 +++ b/go.sum
-@@ -27,8 +27,6 @@ github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERo
+@@ -35,8 +35,6 @@ github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERo
  github.com/Microsoft/go-winio v0.6.2/go.mod h1:yd8OoFMLzJbo9gZq8j5qaps8bJ9aShtEA8Ipt1oGCvU=
  github.com/Microsoft/hcsshim v0.12.3 h1:LS9NXqXhMoqNCplK1ApmVSfB4UnVLRDWRapB6EIlxE0=
  github.com/Microsoft/hcsshim v0.12.3/go.mod h1:Iyl1WVpZzr+UkzjekHZbV8o5Z9ZkxNGx6CtY2Qg/JVQ=
 -github.com/TheJumpCloud/jcapi-go v3.0.0+incompatible h1:hqcTK6ZISdip65SR792lwYJTa/axESA0889D3UlZbLo=
 -github.com/TheJumpCloud/jcapi-go v3.0.0+incompatible/go.mod h1:6B1nuc1MUs6c62ODZDl7hVE5Pv7O2XGSkgg2olnq34I=
+ github.com/alexbrainman/sspi v0.0.0-20250919150558-7d374ff0d59e h1:4dAU9FXIyQktpoUAgOJK3OTFc/xug0PCXYCqU0FgDKI=
+ github.com/alexbrainman/sspi v0.0.0-20250919150558-7d374ff0d59e/go.mod h1:cEWa1LVoE5KvSD9ONXsZrj0z6KqySlCCNKHlLzbqAt4=
  github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be h1:9AeTilPcZAjCFIImctFaOjnTIavg87rW78vTPkQqLI8=
- github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be/go.mod h1:ySMOLuWl6zY27l47sB3qLNK6tF2fkHG55UZxx8oIVo4=
- github.com/awnumar/memcall v0.4.0 h1:B7hgZYdfH6Ot1Goaz8jGne/7i8xD4taZie/PNSFZ29g=
 diff --git a/management/server/idp/idp.go b/management/server/idp/idp.go
-index 4aad674d..54008e29 100644
+index 28e3d81f..74441248 100644
 --- a/management/server/idp/idp.go
 +++ b/management/server/idp/idp.go
-@@ -193,10 +193,6 @@ func NewManager(ctx context.Context, config Config, appMetrics telemetry.AppMetr
+@@ -194,10 +194,6 @@ func NewManager(ctx context.Context, config Config, appMetrics telemetry.AppMetr
  			ServiceAccountKey: config.ExtraConfig["ServiceAccountKey"],
  			CustomerID:        config.ExtraConfig["CustomerId"],
  		}, appMetrics)
@@ -315,58 +313,6 @@ index 6345e424..00000000
 -		Email: user.Email,
 -		Name:  strings.Join(names, " "),
 -		ID:    user.Id,
--	}
--}
-diff --git a/management/server/idp/jumpcloud_test.go b/management/server/idp/jumpcloud_test.go
-deleted file mode 100644
-index 1bfdcefc..00000000
---- a/management/server/idp/jumpcloud_test.go
-+++ /dev/null
-@@ -1,46 +0,0 @@
--package idp
--
--import (
--	"testing"
--
--	"github.com/stretchr/testify/require"
--
--	"github.com/netbirdio/netbird/management/server/telemetry"
--)
--
--func TestNewJumpCloudManager(t *testing.T) {
--	type test struct {
--		name                 string
--		inputConfig          JumpCloudClientConfig
--		assertErrFunc        require.ErrorAssertionFunc
--		assertErrFuncMessage string
--	}
--
--	defaultTestConfig := JumpCloudClientConfig{
--		APIToken: "test123",
--	}
--
--	testCase1 := test{
--		name:                 "Good Configuration",
--		inputConfig:          defaultTestConfig,
--		assertErrFunc:        require.NoError,
--		assertErrFuncMessage: "shouldn't return error",
--	}
--
--	testCase2Config := defaultTestConfig
--	testCase2Config.APIToken = ""
--
--	testCase2 := test{
--		name:                 "Missing APIToken Configuration",
--		inputConfig:          testCase2Config,
--		assertErrFunc:        require.Error,
--		assertErrFuncMessage: "should return error when field empty",
--	}
--
--	for _, testCase := range []test{testCase1, testCase2} {
--		t.Run(testCase.name, func(t *testing.T) {
--			_, err := NewJumpCloudManager(testCase.inputConfig, &telemetry.MockAppMetrics{})
--			testCase.assertErrFunc(t, err, testCase.assertErrFuncMessage)
--		})
 -	}
 -}
 -- 
