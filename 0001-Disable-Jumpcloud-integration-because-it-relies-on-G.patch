@@ -1,4 +1,4 @@
-From ecc1221f5d4ca0bbbfec46d36ca6a51e5821be73 Mon Sep 17 00:00:00 2001
+From 4603728626dc0eac6b90381c1bf7bcc0769bd55b Mon Sep 17 00:00:00 2001
 From: Jonathan Billings <jbilling@redhat.com>
 Date: Wed, 10 Sep 2025 16:02:20 -0400
 Subject: [PATCH] Disable Jumpcloud integration because it relies on Go module
@@ -13,25 +13,25 @@ Subject: [PATCH] Disable Jumpcloud integration because it relies on Go module
  delete mode 100644 management/server/idp/jumpcloud.go
 
 diff --git a/go.mod b/go.mod
-index cf55b926..0a2a2317 100644
+index 2a6c311c..21bfcc8c 100644
 --- a/go.mod
 +++ b/go.mod
 @@ -32,7 +32,6 @@ require (
  require (
  	fyne.io/fyne/v2 v2.7.0
- 	fyne.io/systray v1.11.1-0.20250603113521-ca66a66d8b58
+ 	fyne.io/systray v1.12.1-0.20260116214250-81f8e1a496f9
 -	github.com/TheJumpCloud/jcapi-go v3.0.0+incompatible
  	github.com/awnumar/memguard v0.23.0
  	github.com/aws/aws-sdk-go-v2 v1.36.3
  	github.com/aws/aws-sdk-go-v2/config v1.29.14
 diff --git a/go.sum b/go.sum
-index e89e0ef1..05a526d7 100644
+index 17e5c8ff..c506e9e6 100644
 --- a/go.sum
 +++ b/go.sum
-@@ -35,8 +35,6 @@ github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERo
- github.com/Microsoft/go-winio v0.6.2/go.mod h1:yd8OoFMLzJbo9gZq8j5qaps8bJ9aShtEA8Ipt1oGCvU=
+@@ -36,8 +36,6 @@ github.com/Microsoft/go-winio v0.6.2/go.mod h1:yd8OoFMLzJbo9gZq8j5qaps8bJ9aShtEA
  github.com/Microsoft/hcsshim v0.12.3 h1:LS9NXqXhMoqNCplK1ApmVSfB4UnVLRDWRapB6EIlxE0=
  github.com/Microsoft/hcsshim v0.12.3/go.mod h1:Iyl1WVpZzr+UkzjekHZbV8o5Z9ZkxNGx6CtY2Qg/JVQ=
+ github.com/RaveNoX/go-jsoncommentstrip v1.0.0/go.mod h1:78ihd09MekBnJnxpICcwzCMzGrKSKYe4AqU6PDYYpjk=
 -github.com/TheJumpCloud/jcapi-go v3.0.0+incompatible h1:hqcTK6ZISdip65SR792lwYJTa/axESA0889D3UlZbLo=
 -github.com/TheJumpCloud/jcapi-go v3.0.0+incompatible/go.mod h1:6B1nuc1MUs6c62ODZDl7hVE5Pv7O2XGSkgg2olnq34I=
  github.com/alexbrainman/sspi v0.0.0-20250919150558-7d374ff0d59e h1:4dAU9FXIyQktpoUAgOJK3OTFc/xug0PCXYCqU0FgDKI=
@@ -54,7 +54,7 @@ index 28e3d81f..74441248 100644
  			APIToken:           config.ExtraConfig["ApiToken"],
 diff --git a/management/server/idp/jumpcloud.go b/management/server/idp/jumpcloud.go
 deleted file mode 100644
-index 6345e424..00000000
+index 8c4a9d08..00000000
 --- a/management/server/idp/jumpcloud.go
 +++ /dev/null
 @@ -1,257 +0,0 @@
@@ -65,7 +65,6 @@ index 6345e424..00000000
 -	"fmt"
 -	"net/http"
 -	"strings"
--	"time"
 -
 -	v1 "github.com/TheJumpCloud/jcapi-go/v1"
 -
@@ -106,9 +105,10 @@ index 6345e424..00000000
 -	httpTransport.MaxIdleConns = 5
 -
 -	httpClient := &http.Client{
--		Timeout:   10 * time.Second,
+-		Timeout:   idpTimeout(),
 -		Transport: httpTransport,
 -	}
+-
 -	helper := JsonParser{}
 -
 -	if config.APIToken == "" {
