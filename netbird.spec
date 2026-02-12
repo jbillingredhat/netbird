@@ -11,7 +11,7 @@
 
 # https://github.com/netbirdio/netbird
 %global goipath         github.com/netbirdio/netbird
-%global netbirdversion  0.64.5
+%global netbirdversion  0.64.6
 Version:                %{netbirdversion}
 
 %gometa -L -f
@@ -35,8 +35,6 @@ Source4:        client_config.json
 Patch00:        Disable-Jumpcloud-integration-because-it-relies-on-G.patch
 # Remove TheJumpCloud/jcapi-go module from the go.mod.
 Patch01:        vendor-remove-TheJumpCloud-jcapi-go.patch
-# Add env var to skip DNS probing
-Patch02:        Add-env-var-to-skip-DNS-probing.patch
 
 BuildRequires:  go-vendor-tools
 BuildRequires:  libX11-devel, libXcursor-devel, libXrandr-devel, libglvnd-devel, libXinerama-devel, libXi-devel, libXxf86vm-devel
