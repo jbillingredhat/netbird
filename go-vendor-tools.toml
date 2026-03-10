@@ -15,6 +15,11 @@ sha256sum = "ad1e64b82c04fb2ee6bfe521bff01266971ffaa70500024d4ac767c6033aafb9"
 expression = "BSD-3-Clause"
 
 [[licensing.licenses]]
+path = "vendor/github.com/shirou/gopsutil/v4/LICENSE"
+sha256sum = "ad1e64b82c04fb2ee6bfe521bff01266971ffaa70500024d4ac767c6033aafb9"
+expression = "BSD-3-Clause"
+
+[[licensing.licenses]]
 path = "vendor/github.com/go-text/typesetting/LICENSE"
 sha256sum = "6b1bf94c77d7faa0ce94f8745595bfaf4c404f8b3873f5c2ce55ca15f8e44eca"
 expression = "(Unlicense AND BSD-3-Clause AND (Unlicense OR BSD-3-Clause)) AND BSD-3-Clause AND Unlicense"
