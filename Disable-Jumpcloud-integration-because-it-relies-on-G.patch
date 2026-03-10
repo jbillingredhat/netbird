@@ -1,4 +1,4 @@
-From 4603728626dc0eac6b90381c1bf7bcc0769bd55b Mon Sep 17 00:00:00 2001
+From 3de048304285f43368a8768873e69f2f9eb1d693 Mon Sep 17 00:00:00 2001
 From: Jonathan Billings <jbilling@redhat.com>
 Date: Wed, 10 Sep 2025 16:02:20 -0400
 Subject: [PATCH] Disable Jumpcloud integration because it relies on Go module
@@ -13,7 +13,7 @@ Subject: [PATCH] Disable Jumpcloud integration because it relies on Go module
  delete mode 100644 management/server/idp/jumpcloud.go
 
 diff --git a/go.mod b/go.mod
-index 2a6c311c..21bfcc8c 100644
+index 4bcdbdc78..453de5323 100644
 --- a/go.mod
 +++ b/go.mod
 @@ -32,7 +32,6 @@ require (
@@ -25,12 +25,12 @@ index 2a6c311c..21bfcc8c 100644
  	github.com/aws/aws-sdk-go-v2 v1.36.3
  	github.com/aws/aws-sdk-go-v2/config v1.29.14
 diff --git a/go.sum b/go.sum
-index 17e5c8ff..c506e9e6 100644
+index 1bd9396bb..6ff07368e 100644
 --- a/go.sum
 +++ b/go.sum
-@@ -36,8 +36,6 @@ github.com/Microsoft/go-winio v0.6.2/go.mod h1:yd8OoFMLzJbo9gZq8j5qaps8bJ9aShtEA
- github.com/Microsoft/hcsshim v0.12.3 h1:LS9NXqXhMoqNCplK1ApmVSfB4UnVLRDWRapB6EIlxE0=
- github.com/Microsoft/hcsshim v0.12.3/go.mod h1:Iyl1WVpZzr+UkzjekHZbV8o5Z9ZkxNGx6CtY2Qg/JVQ=
+@@ -34,8 +34,6 @@ github.com/Masterminds/sprig/v3 v3.3.0/go.mod h1:Zy1iXRYNqNLUolqCpL4uhk6SHUMAOSC
+ github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERoyfY=
+ github.com/Microsoft/go-winio v0.6.2/go.mod h1:yd8OoFMLzJbo9gZq8j5qaps8bJ9aShtEA8Ipt1oGCvU=
  github.com/RaveNoX/go-jsoncommentstrip v1.0.0/go.mod h1:78ihd09MekBnJnxpICcwzCMzGrKSKYe4AqU6PDYYpjk=
 -github.com/TheJumpCloud/jcapi-go v3.0.0+incompatible h1:hqcTK6ZISdip65SR792lwYJTa/axESA0889D3UlZbLo=
 -github.com/TheJumpCloud/jcapi-go v3.0.0+incompatible/go.mod h1:6B1nuc1MUs6c62ODZDl7hVE5Pv7O2XGSkgg2olnq34I=
@@ -38,7 +38,7 @@ index 17e5c8ff..c506e9e6 100644
  github.com/alexbrainman/sspi v0.0.0-20250919150558-7d374ff0d59e/go.mod h1:cEWa1LVoE5KvSD9ONXsZrj0z6KqySlCCNKHlLzbqAt4=
  github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be h1:9AeTilPcZAjCFIImctFaOjnTIavg87rW78vTPkQqLI8=
 diff --git a/management/server/idp/idp.go b/management/server/idp/idp.go
-index 28e3d81f..74441248 100644
+index 28e3d81f9..744412482 100644
 --- a/management/server/idp/idp.go
 +++ b/management/server/idp/idp.go
 @@ -194,10 +194,6 @@ func NewManager(ctx context.Context, config Config, appMetrics telemetry.AppMetr
@@ -54,7 +54,7 @@ index 28e3d81f..74441248 100644
  			APIToken:           config.ExtraConfig["ApiToken"],
 diff --git a/management/server/idp/jumpcloud.go b/management/server/idp/jumpcloud.go
 deleted file mode 100644
-index 8c4a9d08..00000000
+index 8c4a9d089..000000000
 --- a/management/server/idp/jumpcloud.go
 +++ /dev/null
 @@ -1,257 +0,0 @@
@@ -316,5 +316,5 @@ index 8c4a9d08..00000000
 -	}
 -}
 -- 
-2.52.0
+2.53.0
 
