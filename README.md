@@ -27,6 +27,8 @@ A .src.rpm package will be created.  You can then build that with rpmbuild or mo
 
 Please follow the [Netbird Documentation](https://docs.netbird.io/).  The only difference with this package is that it is built using the Fedora Golang packages, and that you have to manually enable and start the `netbird.service` Systemd service.
 
+There is a ['netbirdui.service'](./netbirdui.service) systemd --user service that you can enable so the UI gets started automatically when you log in.  Because it's a systemd unit, it gets restarted if the package updates, and it does it the correct Fedora way (via RPM scriptlets).
+
 
 ## How can I preconfigure Netbird to always use my self-hosted service?
 
