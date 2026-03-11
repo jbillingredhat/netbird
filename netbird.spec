@@ -29,12 +29,17 @@ Source1:        %{archivename}-vendor.tar.bz2
 Source2:        go-vendor-tools.toml
 Source3:        netbird.service
 Source4:        client_config.json
+
+# Netbird UI user systemd service
+Source5:        netbirdui.service
+
 # Patch out the Jumpcloud integration from the server code. Does not impact
 # the client, but since it is not included in the vendor tarball, it will
 # impact building the software
 Patch00:        Disable-Jumpcloud-integration-because-it-relies-on-G.patch
 # Remove TheJumpCloud/jcapi-go module from the go.mod.
 Patch01:        vendor-remove-TheJumpCloud-jcapi-go.patch
+
 
 BuildRequires:  go-vendor-tools
 BuildRequires:  libX11-devel, libXcursor-devel, libXrandr-devel, libglvnd-devel, libXinerama-devel, libXi-devel, libXxf86vm-devel
@@ -92,6 +97,7 @@ install -m 0755 -vd %{buildroot}%{_datarootdir}/applications
 install -m 0755 -vd %{buildroot}%{_datarootdir}/icons
 install -m 0755 -vp client/ui/build/netbird.desktop %{buildroot}%{_datarootdir}/applications/netbird.desktop
 install -m 0755 -vp client/ui/assets/netbird.png %{buildroot}%{_datarootdir}/icons/netbird.png
+install -m 0644 -vD %{SOURCE5} %{buildroot}%{_userunitdir}/netbirdui.service
 
 # systemd service
 install -m 0755 -vd %{buildroot}%{_unitdir}
@@ -122,6 +128,17 @@ hardlink --ignore-time %{buildroot}
 %postun client
 %systemd_postun_with_restart netbird.service
 
+%post ui
+%systemd_user_post netbirdui.service
+
+%preun ui
+%systemd_user_preun netbirdui.service
+
+%postun ui
+%systemd_user_postun_with_restart netbirdui.service
+%systemd_user_postun_with_reload netbirdui.service
+%systemd_user_postun netbirdui.service
+
 %files -f %{go_vendor_license_filelist}
 %license vendor/modules.txt
 %doc docs AUTHORS CODE_OF_CONDUCT.md CONTRIBUTING.md
@@ -142,6 +159,7 @@ hardlink --ignore-time %{buildroot}
 %{_bindir}/netbird-ui
 %{_datarootdir}/applications/netbird.desktop
 %{_datarootdir}/icons/netbird.png
+%{_userunitdir}/netbirdui.service
 
 %changelog
 %autochangelog
