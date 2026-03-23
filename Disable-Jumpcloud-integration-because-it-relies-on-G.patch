@@ -1,4 +1,4 @@
-From 3de048304285f43368a8768873e69f2f9eb1d693 Mon Sep 17 00:00:00 2001
+From 692e5a7931126c3d6cce951499327e1659d8af11 Mon Sep 17 00:00:00 2001
 From: Jonathan Billings <jbilling@redhat.com>
 Date: Wed, 10 Sep 2025 16:02:20 -0400
 Subject: [PATCH] Disable Jumpcloud integration because it relies on Go module
@@ -13,10 +13,10 @@ Subject: [PATCH] Disable Jumpcloud integration because it relies on Go module
  delete mode 100644 management/server/idp/jumpcloud.go
 
 diff --git a/go.mod b/go.mod
-index 4bcdbdc78..453de5323 100644
+index 2c911aa4f..3661d6fe0 100644
 --- a/go.mod
 +++ b/go.mod
-@@ -32,7 +32,6 @@ require (
+@@ -30,7 +30,6 @@ require (
  require (
  	fyne.io/fyne/v2 v2.7.0
  	fyne.io/systray v1.12.1-0.20260116214250-81f8e1a496f9
@@ -25,7 +25,7 @@ index 4bcdbdc78..453de5323 100644
  	github.com/aws/aws-sdk-go-v2 v1.36.3
  	github.com/aws/aws-sdk-go-v2/config v1.29.14
 diff --git a/go.sum b/go.sum
-index 1bd9396bb..6ff07368e 100644
+index e26b4edaf..57e07dd7b 100644
 --- a/go.sum
 +++ b/go.sum
 @@ -34,8 +34,6 @@ github.com/Masterminds/sprig/v3 v3.3.0/go.mod h1:Zy1iXRYNqNLUolqCpL4uhk6SHUMAOSC
