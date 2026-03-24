@@ -1,4 +1,4 @@
-[![Copr build status](https://copr.fedorainfracloud.org/coprs/jsbillings/netbird/package/netbird/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/jsbillings/netbird/package/netbird/)
+[![Copr build status](https://copr.devel.redhat.com/coprs/g/endpoint-systems-sysadmins/csb-fedora/package/netbird/status_image/last_build.png)](https://copr.devel.redhat.com/coprs/g/endpoint-systems-sysadmins/csb-fedora/package/netbird/)
 
 # Packaging netbird as a native Fedora Package
 
@@ -13,7 +13,7 @@
 - Install through COPR:
 
 ```
-    dnf copr enable jsbillings/netbird
+    dnf copr enable copr.devel.redhat.com/@endpoint-systems-sysadmins/csb-fedora
     dnf install netbird-client netbird-ui
 ```
 
