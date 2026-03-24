@@ -1,0 +1,11 @@
+/var/log/netbird/client.log {
+    weekly
+    rotate 4
+    missingok
+    notifempty
+    sharedscripts
+    delaycompress
+    postrotate
+        /bin/systemctl restart netbird.service > /dev/null 2>/dev/null || true
+    endscript
+}

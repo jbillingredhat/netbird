@@ -33,6 +33,9 @@ Source4:        client_config.json
 # Netbird UI user systemd service
 Source5:        netbirdui.service
 
+# Configure logrotate to rotate client log
+Source6:        netbird.logrotate
+
 # Patch out the Jumpcloud integration from the server code. Does not impact
 # the client, but since it is not included in the vendor tarball, it will
 # impact building the software
@@ -85,6 +88,9 @@ for cmd in client client/ui; do
   %gobuild -o %{gobuilddir}/bin/$(basename $cmd) %{goipath}/$cmd
 done
 
+# Copy the client config into the build directory
+cp %{SOURCE4} .
+
 %install
 %go_vendor_license_install -c %{SOURCE2}
 install -m 0755 -vd %{buildroot}%{_bindir}
@@ -101,11 +107,12 @@ install -m 0644 -vD %{SOURCE5} %{buildroot}%{_userunitdir}/netbirdui.service
 
 # systemd service
 install -m 0755 -vd %{buildroot}%{_unitdir}
-install -m 0755 -vp %{SOURCE3} %{buildroot}%{_unitdir}/netbird.service
+install -m 0644 -vp %{SOURCE3} %{buildroot}%{_unitdir}/netbird.service
 install -m 0755 -vd %{buildroot}%{_sharedstatedir}/netbird
 
 # log directory
-install -m 0755 -vd %{buildroot}%{_sysconfdir}%{_localstatedir}/log/netbird
+install -m 0744 -vd %{buildroot}%{_localstatedir}/log/netbird
+install -m 0644 -vD %{SOURCE6} %{buildroot}%{_sysconfdir}/logrotate.d/netbird
 
 # client configration
 install -m 0755 -vd %{buildroot}%{_sysconfdir}/netbird
@@ -148,11 +155,13 @@ hardlink --ignore-time %{buildroot}
 %{_bindir}/netbird
 %{_unitdir}/netbird.service
 %dir %{_sysconfdir}/netbird
-%dir %{_sharedstatedir}/netbird
+%attr(0755, root, root) %dir %{_sharedstatedir}/netbird
 %ghost %config(noreplace) %{_sysconfdir}/netbird/config.json
 %ghost %config(noreplace) %{_sharedstatedir}/netbird/active_profile.json
 %ghost %config(noreplace) %{_sharedstatedir}/netbird/state.json
+%attr(0744, root, root) %dir %{_localstatedir}/log/netbird
 %ghost %{_localstatedir}/log/netbird/client.log
+%{_sysconfdir}/logrotate.d/netbird
 %ghost %{_rundir}/netbird.sock
 
 %files ui
