@@ -109,7 +109,6 @@ install -m 0755 -vd %{buildroot}%{_sysconfdir}%{_localstatedir}/log/netbird
 
 # client configration
 install -m 0755 -vd %{buildroot}%{_sysconfdir}/netbird
-install -m 0755 -vp %{SOURCE4} %{buildroot}%{_sysconfdir}/netbird/config.json
 
 # Create hard links for all the duplicate license files
 hardlink --ignore-time %{buildroot}
@@ -143,13 +142,14 @@ hardlink --ignore-time %{buildroot}
 %license vendor/modules.txt
 %doc docs AUTHORS CODE_OF_CONDUCT.md CONTRIBUTING.md
 %doc CONTRIBUTOR_LICENSE_AGREEMENT.md README.md SECURITY.md
+%doc client_config.json
 
 %files client
 %{_bindir}/netbird
 %{_unitdir}/netbird.service
 %dir %{_sysconfdir}/netbird
 %dir %{_sharedstatedir}/netbird
-%config(noreplace) %{_sysconfdir}/netbird/config.json
+%ghost %config(noreplace) %{_sysconfdir}/netbird/config.json
 %ghost %config(noreplace) %{_sharedstatedir}/netbird/active_profile.json
 %ghost %config(noreplace) %{_sharedstatedir}/netbird/state.json
 %ghost %{_localstatedir}/log/netbird/client.log
