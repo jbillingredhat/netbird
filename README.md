@@ -43,5 +43,4 @@ The netbird packages provided by the company [Netbird (GmbH)](https://netbird.io
 - Uses the standard systemd macros for the %post, %prun, and %postun package.
 - Separates out a -client and -ui package.
 - Actually properly attributes all the licenses used to build the client.
-- A promblematic Go module (github.com/TheJumpCloud/jcapi-go) that lacks licensing is patched out.  Fortunately, this module is ONLY used as part of the authentication service for the Netbird server, and is not used in the netbird CLI client or the UI.  But because Fedora builds a vendor tarball of all upstream sources to build, we need to remove it from the build process.
 
