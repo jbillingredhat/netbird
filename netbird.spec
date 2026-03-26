@@ -11,7 +11,7 @@
 
 # https://github.com/netbirdio/netbird
 %global goipath         github.com/netbirdio/netbird
-%global netbirdversion  0.67.0
+%global netbirdversion  0.67.1
 Version:                %{netbirdversion}
 
 %gometa -L -f
@@ -35,14 +35,6 @@ Source5:        netbirdui.service
 
 # Configure logrotate to rotate client log
 Source6:        netbird.logrotate
-
-# Patch out the Jumpcloud integration from the server code. Does not impact
-# the client, but since it is not included in the vendor tarball, it will
-# impact building the software
-Patch00:        Disable-Jumpcloud-integration-because-it-relies-on-G.patch
-# Remove TheJumpCloud/jcapi-go module from the go.mod.
-Patch01:        vendor-remove-TheJumpCloud-jcapi-go.patch
-
 
 BuildRequires:  go-vendor-tools
 BuildRequires:  libX11-devel, libXcursor-devel, libXrandr-devel, libglvnd-devel, libXinerama-devel, libXi-devel, libXxf86vm-devel
