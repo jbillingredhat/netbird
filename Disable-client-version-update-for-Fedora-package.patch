@@ -1,0 +1,42 @@
+From e503773d00e7b10da3fedf9da4340d7f13315825 Mon Sep 17 00:00:00 2001
+From: Jonathan Billings <jbilling@redhat.com>
+Date: Fri, 10 Apr 2026 11:53:11 -0400
+Subject: [PATCH] Disable client version update for Fedora package
+
+We do not want to use the upstream Netbird version check because
+we are maintaining packages apart from upstream.  This commit
+disables the check and logs that it isn't supported.
+---
+ client/internal/updater/manager.go | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/client/internal/updater/manager.go b/client/internal/updater/manager.go
+index dfcb93177..0716ed8e8 100644
+--- a/client/internal/updater/manager.go
++++ b/client/internal/updater/manager.go
+@@ -132,6 +132,11 @@ func (m *Manager) Start(ctx context.Context) {
+ 		return
+ 	}
+ 
++	if !m.autoUpdateSupported() {
++		log.Infof("update checking disabled on this platform")
++		return
++	}
++
+ 	m.update.SetDaemonVersion(m.currentVersion)
+ 	m.update.SetOnUpdateListener(func() {
+ 		select {
+@@ -252,6 +257,10 @@ func (m *Manager) tryInstall(ctx context.Context, targetVersion *v.Version) erro
+ // Only needed for download-only mode where the latest version is already cached
+ // NotifyUI re-publishes the current update state so a newly connected UI gets the info.
+ func (m *Manager) NotifyUI() {
++	if !m.autoUpdateSupported() {
++		return
++	}
++
+ 	m.updateMutex.Lock()
+ 	if m.update == nil {
+ 		m.updateMutex.Unlock()
+-- 
+2.53.0
+
