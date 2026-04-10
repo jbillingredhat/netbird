@@ -11,7 +11,7 @@
 
 # https://github.com/netbirdio/netbird
 %global goipath         github.com/netbirdio/netbird
-%global netbirdversion  0.67.4
+%global netbirdversion  0.68.1
 Version:                %{netbirdversion}
 
 %gometa -L -f
@@ -35,6 +35,10 @@ Source5:        netbirdui.service
 
 # Configure logrotate to rotate client log
 Source6:        netbird.logrotate
+
+# Local updates
+## Disable the update client check for Fedora package
+Patch01:        Disable-client-version-update-for-Fedora-package.patch
 
 BuildRequires:  go-vendor-tools
 BuildRequires:  libX11-devel, libXcursor-devel, libXrandr-devel, libglvnd-devel, libXinerama-devel, libXi-devel, libXxf86vm-devel
