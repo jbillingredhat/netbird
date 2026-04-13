@@ -132,7 +132,7 @@ init_stream_connect(netbird_t)
 # Allow checking if systemd-resolved is running
 init_get_system_status(netbird_t)
 optional_policy(`
-	systemd_dbus_chat_resolved(netbird_t)
+	systemd_chat_resolved(netbird_t)
 ')
 
 # Allow reading of locale data
