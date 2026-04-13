@@ -1,0 +1,149 @@
+policy_module(netbird, 1.0.4)
+
+########################################
+#
+# Declarations
+#
+
+type netbird_t;
+type netbird_exec_t;
+init_daemon_domain(netbird_t, netbird_exec_t)
+
+type netbird_var_lib_t;
+files_type(netbird_var_lib_t)
+
+type netbird_var_log_t;
+logging_log_file(netbird_var_log_t)
+
+type netbird_etc_t;
+files_config_file(netbird_etc_t)
+
+type netbird_runtime_t;
+files_pid_file(netbird_runtime_t)
+
+########################################
+#
+# netbird local policy
+#
+
+allow netbird_t self:capability { net_admin net_raw sys_admin bpf };
+allow netbird_t self:process { signal_perms };
+allow netbird_t self:fifo_file rw_fifo_file_perms;
+allow netbird_t self:unix_stream_socket create_stream_socket_perms;
+allow netbird_t self:unix_dgram_socket create_socket_perms;
+allow netbird_t self:netlink_route_socket { create_netlink_socket_perms nlmsg_read nlmsg_write };
+allow netbird_t self:tcp_socket create_stream_socket_perms;
+allow netbird_t self:udp_socket create_socket_perms;
+allow netbird_t self:tun_socket create_socket_perms;
+
+# Allow eBPF operations for DNS forwarding and WireGuard proxy
+# Netbird uses XDP programs attached to loopback interface for packet filtering
+allow netbird_t self:bpf { map_create map_read map_write prog_load prog_run };
+allow netbird_t self:capability2 bpf;
+# Allow setting resource limits (required for RemoveMemlock)
+allow netbird_t self:process setrlimit;
+
+# Allow netbird to manage its configuration files
+allow netbird_t netbird_etc_t:dir list_dir_perms;
+allow netbird_t netbird_etc_t:file read_file_perms;
+allow netbird_t netbird_etc_t:lnk_file read_lnk_file_perms;
+
+# Allow netbird to manage its state files
+manage_dirs_pattern(netbird_t, netbird_var_lib_t, netbird_var_lib_t)
+manage_files_pattern(netbird_t, netbird_var_lib_t, netbird_var_lib_t)
+manage_lnk_files_pattern(netbird_t, netbird_var_lib_t, netbird_var_lib_t)
+files_var_lib_filetrans(netbird_t, netbird_var_lib_t, { dir file })
+
+# Allow netbird to manage its log files
+manage_dirs_pattern(netbird_t, netbird_var_log_t, netbird_var_log_t)
+append_files_pattern(netbird_t, netbird_var_log_t, netbird_var_log_t)
+create_files_pattern(netbird_t, netbird_var_log_t, netbird_var_log_t)
+setattr_files_pattern(netbird_t, netbird_var_log_t, netbird_var_log_t)
+logging_log_filetrans(netbird_t, netbird_var_log_t, { dir file })
+
+# Allow netbird to manage its runtime files (unix socket)
+manage_dirs_pattern(netbird_t, netbird_runtime_t, netbird_runtime_t)
+manage_files_pattern(netbird_t, netbird_runtime_t, netbird_runtime_t)
+manage_sock_files_pattern(netbird_t, netbird_runtime_t, netbird_runtime_t)
+files_pid_filetrans(netbird_t, netbird_runtime_t, { dir file sock_file })
+
+# Allow access to /dev/net/tun for userspace WireGuard fallback
+# Primary mode uses kernel WireGuard module (no TUN device needed)
+# Fallback mode uses userspace WireGuard with TUN device
+corenet_rw_tun_tap_dev(netbird_t)
+
+# Allow netbird to read and manage network configuration
+# This includes modifying /etc/resolv.conf when not using systemd-resolved
+sysnet_read_config(netbird_t)
+sysnet_write_config(netbird_t)
+sysnet_dns_name_resolve(netbird_t)
+
+# Allow netbird to use network
+corenet_all_recvfrom_unlabeled(netbird_t)
+corenet_all_recvfrom_netlabel(netbird_t)
+corenet_tcp_sendrecv_generic_if(netbird_t)
+corenet_udp_sendrecv_generic_if(netbird_t)
+corenet_tcp_sendrecv_generic_node(netbird_t)
+corenet_udp_sendrecv_generic_node(netbird_t)
+corenet_tcp_connect_all_ports(netbird_t)
+corenet_udp_bind_generic_node(netbird_t)
+corenet_udp_bind_all_ports(netbird_t)
+
+# Allow netbird to read /etc/sysconfig/netbird
+files_read_etc_files(netbird_t)
+
+# Allow writing to /etc/iproute2/rt_tables to register custom routing table
+allow netbird_t self:capability { dac_override };
+sysnet_manage_config(netbird_t)
+
+# Allow reading and writing /proc/sys/net for network configuration
+# Netbird modifies sysctl parameters like ip_forward, rp_filter, src_valid_mark
+kernel_read_system_state(netbird_t)
+kernel_read_network_state(netbird_t)
+kernel_rw_net_sysctls(netbird_t)
+
+# Allow access to eBPF filesystem and BTF information
+fs_read_bpf(netbird_t)
+fs_manage_bpf_dirs(netbird_t)
+fs_manage_bpf_files(netbird_t)
+kernel_read_debugfs(netbird_t)
+
+# Allow reading random/urandom
+dev_read_rand(netbird_t)
+dev_read_urand(netbird_t)
+
+# Allow access to /proc/sys/net/ipv4 and ipv6 for routing
+sysnet_exec_ifconfig(netbird_t)
+
+# Allow execution of iptables and nftables for firewall management
+# Netbird uses either iptables or nftables to manage ACLs and routing
+iptables_domtrans(netbird_t)
+optional_policy(`
+	nftables_domtrans(netbird_t)
+')
+
+# Allow reading of certificate files
+miscfiles_read_generic_certs(netbird_t)
+
+# Allow systemd integration
+init_read_state(netbird_t)
+init_stream_connect(netbird_t)
+
+# Allow checking if systemd-resolved is running
+init_get_system_status(netbird_t)
+optional_policy(`
+	systemd_dbus_chat_resolved(netbird_t)
+')
+
+# Allow reading of locale data
+miscfiles_read_localization(netbird_t)
+
+# Allow creating network interfaces
+allow netbird_t self:rawip_socket create_socket_perms;
+
+# Allow netlink operations for routing and firewall management
+# Netbird uses netlink extensively via vishvananda/netlink library
+allow netbird_t self:netlink_netfilter_socket create_socket_perms;
+
+# Logging
+logging_send_syslog_msg(netbird_t)
