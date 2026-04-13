@@ -1,0 +1,14 @@
+# netbird executable
+/usr/bin/netbird		--	gen_context(system_u:object_r:netbird_exec_t,s0)
+
+# netbird configuration
+/etc/netbird(/.*)?			gen_context(system_u:object_r:netbird_etc_t,s0)
+
+# netbird state files
+/var/lib/netbird(/.*)?		gen_context(system_u:object_r:netbird_var_lib_t,s0)
+
+# netbird log files
+/var/log/netbird(/.*)?		gen_context(system_u:object_r:netbird_var_log_t,s0)
+
+# netbird runtime files (unix socket)
+/run/netbird\.sock		--	gen_context(system_u:object_r:netbird_runtime_t,s0)

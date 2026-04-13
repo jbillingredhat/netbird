@@ -23,6 +23,17 @@
 ```
 A .src.rpm package will be created.  You can then build that with rpmbuild or mock.
 
+## SELinux Support
+
+This package includes a `netbird-selinux` subpackage that provides a comprehensive SELinux policy module for security confinement. Without this policy, netbird runs in an unconfined domain with broad system access. The policy confines netbird to a restricted domain with only the permissions it needs:
+
+- WireGuard network interface management (kernel module or userspace TUN fallback)
+- DNS configuration (`/etc/resolv.conf`) modification
+- eBPF program loading for DNS forwarding and WireGuard proxy
+- Network operations and routing
+
+On SELinux-enabled systems (default for Fedora/RHEL), the policy is automatically installed with `netbird-client`, enhancing system security through mandatory access control. See [SELINUX_README.md](./SELINUX_README.md) for details.
+
 ## How to use Netbird
 
 Please follow the [Netbird Documentation](https://docs.netbird.io/).  The only difference with this package is that it is built using the Fedora Golang packages, and that you have to manually enable and start the `netbird.service` Systemd service.
@@ -43,4 +54,5 @@ The netbird packages provided by the company [Netbird (GmbH)](https://netbird.io
 - Uses the standard systemd macros for the %post, %prun, and %postun package.
 - Separates out a -client and -ui package.
 - Actually properly attributes all the licenses used to build the client.
+- Includes a comprehensive SELinux policy module (netbird-selinux) that confines netbird to a secure, restricted domain on SELinux-enabled systems. This improves security through mandatory access control while supporting all netbird features including WireGuard interface management, DNS configuration, and eBPF operations.
 

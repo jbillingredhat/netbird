@@ -16,6 +16,9 @@ Version:                %{netbirdversion}
 
 %gometa -L -f
 
+# SELinux policy type
+%global selinuxtype targeted
+
 Name:           netbird
 Release:        %autorelease
 Summary:        Connect your devices into a secure WireGuard®-based overlay network with SSO, MFA and granular access controls
@@ -36,11 +39,17 @@ Source5:        netbirdui.service
 # Configure logrotate to rotate client log
 Source6:        netbird.logrotate
 
+# SELinux policy files
+Source7:        netbird.te
+Source8:        netbird.fc
+Source9:        netbird.if
+
 # Local updates
 ## Disable the update client check for Fedora package
 Patch01:        Disable-client-version-update-for-Fedora-package.patch
 
 BuildRequires:  go-vendor-tools
+BuildRequires:  selinux-policy-devel
 BuildRequires:  libX11-devel, libXcursor-devel, libXrandr-devel, libglvnd-devel, libXinerama-devel, libXi-devel, libXxf86vm-devel
 BuildRequires:  systemd-rpm-macros
 # for hardlinks executable
@@ -53,6 +62,7 @@ MFA and granular access controls.
 %package client
 Summary: The netbird client command line tool and systemd service
 Requires: %{name} = %{version}-%{release}
+Requires: (%{name}-selinux = %{version}-%{release} if selinux-policy-targeted)
 
 %description client
 The netbird client includes the 'netbird' command line tool as well as
@@ -67,10 +77,28 @@ Requires: %{name}-client = %{version}-%{release}
 %description ui
 The graphical client used to run and manage your netbird connection.
 
+%package selinux
+Summary: SELinux policy module for netbird
+BuildArch: noarch
+Requires: %{name}-client = %{version}-%{release}
+Requires: selinux-policy-base >= %{_selinux_policy_version}
+Requires(post): selinux-policy-base >= %{_selinux_policy_version}
+Requires(post): policycoreutils
+Requires(post): libselinux-utils
+%{?selinux_requires}
+
+%description selinux
+SELinux policy module for netbird. This package provides the SELinux policy
+required for netbird to manage network interfaces, modify DNS configuration,
+and perform other VPN-related operations.
+
 %prep
 %goprep -A
 %setup -q -T -D -a1 %{forgesetupargs}
 %autopatch -p1
+
+# Copy SELinux policy files to build directory
+cp %{SOURCE7} %{SOURCE8} %{SOURCE9} .
 
 %generate_buildrequires
 %go_vendor_license_buildrequires -c %{SOURCE2}
@@ -86,6 +114,10 @@ done
 
 # Copy the client config into the build directory
 cp %{SOURCE4} .
+
+# Build SELinux policy module
+make -f /usr/share/selinux/devel/Makefile netbird.pp
+bzip2 -9 netbird.pp
 
 %install
 %go_vendor_license_install -c %{SOURCE2}
@@ -112,6 +144,10 @@ install -m 0644 -vD %{SOURCE6} %{buildroot}%{_sysconfdir}/logrotate.d/netbird
 
 # client configration
 install -m 0755 -vd %{buildroot}%{_sysconfdir}/netbird
+
+# SELinux policy module
+install -m 0755 -vd %{buildroot}%{_datadir}/selinux/packages
+install -m 0644 -vp netbird.pp.bz2 %{buildroot}%{_datadir}/selinux/packages/
 
 # Create hard links for all the duplicate license files
 hardlink --ignore-time %{buildroot}
@@ -141,6 +177,29 @@ hardlink --ignore-time %{buildroot}
 %systemd_user_postun_with_reload netbirdui.service
 %systemd_user_postun netbirdui.service
 
+%pre selinux
+%selinux_relabel_pre -s %{selinuxtype}
+
+%post selinux
+%selinux_modules_install -s %{selinuxtype} %{_datadir}/selinux/packages/netbird.pp.bz2
+if [ $1 -eq 1 ]; then
+    # First installation - restore file contexts
+    restorecon -R %{_bindir}/netbird 2>/dev/null || :
+    restorecon -R %{_sysconfdir}/netbird 2>/dev/null || :
+    restorecon -R %{_sharedstatedir}/netbird 2>/dev/null || :
+    restorecon -R %{_localstatedir}/log/netbird 2>/dev/null || :
+    restorecon -F %{_rundir}/netbird.sock 2>/dev/null || :
+fi
+
+%postun selinux
+if [ $1 -eq 0 ]; then
+    # Complete removal
+    %selinux_modules_uninstall -s %{selinuxtype} netbird
+fi
+
+%posttrans selinux
+%selinux_relabel_post -s %{selinuxtype}
+
 %files -f %{go_vendor_license_filelist}
 %license vendor/modules.txt
 %doc docs AUTHORS CODE_OF_CONDUCT.md CONTRIBUTING.md
@@ -165,6 +224,10 @@ hardlink --ignore-time %{buildroot}
 %{_datarootdir}/applications/netbird.desktop
 %{_datarootdir}/icons/netbird.png
 %{_userunitdir}/netbirdui.service
+
+%files selinux
+%{_datadir}/selinux/packages/netbird.pp.bz2
+%ghost %{_sharedstatedir}/selinux/%{selinuxtype}/active/modules/200/netbird
 
 %changelog
 %autochangelog
