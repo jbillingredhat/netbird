@@ -26,7 +26,7 @@ files_pid_file(netbird_runtime_t)
 # netbird local policy
 #
 
-allow netbird_t self:capability { net_admin net_raw sys_admin bpf };
+allow netbird_t self:capability { net_admin net_raw sys_admin };
 allow netbird_t self:process { signal_perms };
 allow netbird_t self:fifo_file rw_fifo_file_perms;
 allow netbird_t self:unix_stream_socket create_stream_socket_perms;
@@ -103,9 +103,8 @@ kernel_read_network_state(netbird_t)
 kernel_rw_net_sysctls(netbird_t)
 
 # Allow access to eBPF filesystem and BTF information
-fs_read_bpf(netbird_t)
-fs_manage_bpf_dirs(netbird_t)
-fs_manage_bpf_files(netbird_t)
+# Note: BPF filesystem types and capabilities not available on this SELinux policy version
+# The policy will still allow eBPF operations via the 'bpf' object class permissions below
 kernel_read_debugfs(netbird_t)
 
 # Allow reading random/urandom
@@ -118,9 +117,10 @@ sysnet_exec_ifconfig(netbird_t)
 # Allow execution of iptables and nftables for firewall management
 # Netbird uses either iptables or nftables to manage ACLs and routing
 iptables_domtrans(netbird_t)
-optional_policy(`
-	nftables_domtrans(netbird_t)
-')
+# Note: nftables_domtrans interface not available on this system
+# optional_policy(`
+# 	nftables_domtrans(netbird_t)
+# ')
 
 # Allow reading of certificate files
 miscfiles_read_generic_certs(netbird_t)
@@ -130,7 +130,8 @@ init_read_state(netbird_t)
 init_stream_connect(netbird_t)
 
 # Allow checking if systemd-resolved is running
-init_get_system_status(netbird_t)
+# Note: init_get_system_status interface not available on this system
+# init_get_system_status(netbird_t)
 optional_policy(`
 	systemd_chat_resolved(netbird_t)
 ')
