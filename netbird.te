@@ -36,6 +36,7 @@ require {
 	type system_dbusd_var_run_t;
 	type sssd_var_lib_t;
 	type virt_var_lib_t;
+	type iptables_t;
 }
 
 allow netbird_t self:capability { net_admin net_raw sys_admin };
@@ -44,7 +45,7 @@ allow netbird_t self:fifo_file rw_fifo_file_perms;
 allow netbird_t self:unix_stream_socket create_stream_socket_perms;
 allow netbird_t self:unix_dgram_socket create_socket_perms;
 allow netbird_t self:netlink_route_socket { create_netlink_socket_perms nlmsg_read nlmsg_write };
-allow netbird_t self:netlink_generic_socket { bind create getattr getopt setopt };
+allow netbird_t self:netlink_generic_socket { bind create getattr getopt read setopt write };
 allow netbird_t self:tcp_socket create_stream_socket_perms;
 allow netbird_t self:udp_socket create_socket_perms;
 allow netbird_t self:tun_socket create_socket_perms;
@@ -126,7 +127,7 @@ kernel_read_debugfs(netbird_t)
 
 # Allow reading cgroup information
 allow netbird_t cgroup_t:dir search;
-allow netbird_t cgroup_t:file read;
+allow netbird_t cgroup_t:file { open read };
 
 # Allow reading password/user information
 allow netbird_t passwd_file_t:file { getattr open read };
@@ -148,6 +149,7 @@ sysnet_exec_ifconfig(netbird_t)
 # Allow execution of iptables and nftables for firewall management
 # Netbird uses either iptables or nftables to manage ACLs and routing
 iptables_domtrans(netbird_t)
+allow netbird_t iptables_t:process { noatsecure rlimitinh siginh };
 # Note: nftables_domtrans interface not available on this system
 # optional_policy(`
 # 	nftables_domtrans(netbird_t)
