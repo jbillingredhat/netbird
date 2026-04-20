@@ -32,6 +32,7 @@ allow netbird_t self:fifo_file rw_fifo_file_perms;
 allow netbird_t self:unix_stream_socket create_stream_socket_perms;
 allow netbird_t self:unix_dgram_socket create_socket_perms;
 allow netbird_t self:netlink_route_socket { create_netlink_socket_perms nlmsg_read nlmsg_write };
+allow netbird_t self:netlink_generic_socket { bind create getattr getopt setopt };
 allow netbird_t self:tcp_socket create_stream_socket_perms;
 allow netbird_t self:udp_socket create_socket_perms;
 allow netbird_t self:tun_socket create_socket_perms;
@@ -39,7 +40,7 @@ allow netbird_t self:tun_socket create_socket_perms;
 # Allow eBPF operations for DNS forwarding and WireGuard proxy
 # Netbird uses XDP programs attached to loopback interface for packet filtering
 allow netbird_t self:bpf { map_create map_read map_write prog_load prog_run };
-allow netbird_t self:capability2 bpf;
+allow netbird_t self:capability2 { bpf perfmon };
 # Allow setting resource limits (required for RemoveMemlock)
 allow netbird_t self:process setrlimit;
 
@@ -86,6 +87,8 @@ corenet_udp_sendrecv_generic_if(netbird_t)
 corenet_tcp_sendrecv_generic_node(netbird_t)
 corenet_udp_sendrecv_generic_node(netbird_t)
 corenet_tcp_connect_all_ports(netbird_t)
+corenet_tcp_bind_generic_node(netbird_t)
+corenet_tcp_bind_dns_port(netbird_t)
 corenet_udp_bind_generic_node(netbird_t)
 corenet_udp_bind_all_ports(netbird_t)
 
@@ -106,6 +109,18 @@ kernel_rw_net_sysctls(netbird_t)
 # Note: BPF filesystem types and capabilities not available on this SELinux policy version
 # The policy will still allow eBPF operations via the 'bpf' object class permissions below
 kernel_read_debugfs(netbird_t)
+
+# Allow reading cgroup information
+fs_read_cgroup_files(netbird_t)
+
+# Allow reading password/user information
+auth_read_passwd(netbird_t)
+
+# Allow executing binaries (for helper commands)
+corecmd_exec_bin(netbird_t)
+
+# Allow reading udev runtime files
+udev_read_runtime_files(netbird_t)
 
 # Allow reading random/urandom
 dev_read_rand(netbird_t)
@@ -129,11 +144,26 @@ miscfiles_read_generic_certs(netbird_t)
 init_read_state(netbird_t)
 init_stream_connect(netbird_t)
 
+# Allow D-Bus communication
+optional_policy(`
+	dbus_system_bus_client(netbird_t)
+')
+
 # Allow checking if systemd-resolved is running
 # Note: init_get_system_status interface not available on this system
 # init_get_system_status(netbird_t)
 optional_policy(`
 	systemd_chat_resolved(netbird_t)
+')
+
+# Allow access to SSSD for user authentication
+optional_policy(`
+	sssd_read_lib_files(netbird_t)
+')
+
+# Allow reading virtualization information
+optional_policy(`
+	virt_read_lib_files(netbird_t)
 ')
 
 # Allow reading of locale data
