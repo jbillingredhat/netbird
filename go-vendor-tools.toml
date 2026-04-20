@@ -1,3 +1,8 @@
+[archive]
+post_commands = [
+    ["rm", "-rf", "vendor/github.com/mailru"],
+]
+
 [licensing]
 detector = "askalono"
 exclude_files = [
