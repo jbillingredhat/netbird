@@ -26,6 +26,18 @@ files_pid_file(netbird_runtime_t)
 # netbird local policy
 #
 
+require {
+	type udev_var_run_t;
+	type bin_t;
+	type cgroup_t;
+	type dns_port_t;
+	type passwd_file_t;
+	type node_t;
+	type system_dbusd_var_run_t;
+	type sssd_var_lib_t;
+	type virt_var_lib_t;
+}
+
 allow netbird_t self:capability { net_admin net_raw sys_admin };
 allow netbird_t self:process { signal_perms };
 allow netbird_t self:fifo_file rw_fifo_file_perms;
@@ -87,10 +99,12 @@ corenet_udp_sendrecv_generic_if(netbird_t)
 corenet_tcp_sendrecv_generic_node(netbird_t)
 corenet_udp_sendrecv_generic_node(netbird_t)
 corenet_tcp_connect_all_ports(netbird_t)
-corenet_tcp_bind_generic_node(netbird_t)
-corenet_tcp_bind_dns_port(netbird_t)
 corenet_udp_bind_generic_node(netbird_t)
 corenet_udp_bind_all_ports(netbird_t)
+
+# Allow binding to DNS port and nodes for DNS proxy
+allow netbird_t dns_port_t:tcp_socket name_bind;
+allow netbird_t node_t:tcp_socket node_bind;
 
 # Allow netbird to read /etc/sysconfig/netbird
 files_read_etc_files(netbird_t)
@@ -111,16 +125,18 @@ kernel_rw_net_sysctls(netbird_t)
 kernel_read_debugfs(netbird_t)
 
 # Allow reading cgroup information
-fs_read_cgroup_files(netbird_t)
+allow netbird_t cgroup_t:dir search;
+allow netbird_t cgroup_t:file read;
 
 # Allow reading password/user information
-auth_read_passwd(netbird_t)
+allow netbird_t passwd_file_t:file { getattr open read };
 
 # Allow executing binaries (for helper commands)
 corecmd_exec_bin(netbird_t)
+allow netbird_t bin_t:file { execute execute_no_trans map };
 
 # Allow reading udev runtime files
-udev_read_runtime_files(netbird_t)
+allow netbird_t udev_var_run_t:file { open read };
 
 # Allow reading random/urandom
 dev_read_rand(netbird_t)
@@ -145,6 +161,7 @@ init_read_state(netbird_t)
 init_stream_connect(netbird_t)
 
 # Allow D-Bus communication
+allow netbird_t system_dbusd_var_run_t:sock_file write;
 optional_policy(`
 	dbus_system_bus_client(netbird_t)
 ')
@@ -157,14 +174,11 @@ optional_policy(`
 ')
 
 # Allow access to SSSD for user authentication
-optional_policy(`
-	sssd_read_lib_files(netbird_t)
-')
+allow netbird_t sssd_var_lib_t:dir search;
 
 # Allow reading virtualization information
-optional_policy(`
-	virt_read_lib_files(netbird_t)
-')
+allow netbird_t virt_var_lib_t:dir { getattr open read search };
+allow netbird_t virt_var_lib_t:file { open read };
 
 # Allow reading of locale data
 miscfiles_read_localization(netbird_t)
