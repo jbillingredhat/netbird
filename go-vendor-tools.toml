@@ -59,3 +59,7 @@ path = "vendor/github.com/shopspring/decimal/LICENSE"
 sha256sum = "b92ba0f6ee02f2309628bfdadb123668a17c016e475ba477b857d33470d9d625"
 expression = "MIT"
 
+[[licensing.licenses]]
+path = "vendor/git.sr.ht/~jackmordaunt/go-toast/v2/LICENSE"
+sha256sum = "1b57eeb121b97d5920085fddd4cf395e71b8b027051a367bec8228688d68292f"
+expression = "Unlicense AND MIT"
