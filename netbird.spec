@@ -11,7 +11,7 @@
 
 # https://github.com/netbirdio/netbird
 %global goipath         github.com/netbirdio/netbird
-%global netbirdversion  0.70.5
+%global netbirdversion  0.71.2
 Version:                %{netbirdversion}
 
 %gometa -L -f
