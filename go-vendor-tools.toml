@@ -63,3 +63,9 @@ expression = "MIT"
 path = "vendor/git.sr.ht/~jackmordaunt/go-toast/v2/LICENSE"
 sha256sum = "1b57eeb121b97d5920085fddd4cf395e71b8b027051a367bec8228688d68292f"
 expression = "Unlicense AND MIT"
+
+[[licensing.licenses]]
+path = "vendor/howett.net/plist/LICENSE"
+sha256sum = "20d9b7d9372369484ecadae229d3e3efee8029b259e11c9a1b07d2e0a3c82e39"
+expression = "BSD-2-Clause"
+
