@@ -1,6 +1,19 @@
 [archive]
-post_commands = [
-    ["rm", "-rf", "vendor/github.com/mailru"],
+tidy = false
+pre_commands = [
+    ["bash", "-xeuo", "pipefail", "-c",
+    '''
+    MYGOPATH=$(go env GOPATH)
+    WAILS_VERSION=$(go list -m -f '{{.Version}}' github.com/wailsapp/wails/v3)
+    go mod tidy
+    chmod +rwx $MYGOPATH/pkg/mod/github.com/wailsapp/wails/v3@${WAILS_VERSION}/internal/webview2/webviewloader
+    mkdir -p $MYGOPATH/pkg/mod/github.com/wailsapp/wails/v3@${WAILS_VERSION}/internal/webview2/webviewloader/arm64
+    mkdir -p $MYGOPATH/pkg/mod/github.com/wailsapp/wails/v3@${WAILS_VERSION}/internal/webview2/webviewloader/x64
+    mkdir -p $MYGOPATH/pkg/mod/github.com/wailsapp/wails/v3@${WAILS_VERSION}/internal/webview2/webviewloader/x86
+    touch $MYGOPATH/pkg/mod/github.com/wailsapp/wails/v3@${WAILS_VERSION}/internal/webview2/webviewloader/arm64/WebView2Loader.dll
+    touch $MYGOPATH/pkg/mod/github.com/wailsapp/wails/v3@${WAILS_VERSION}/internal/webview2/webviewloader/x64/WebView2Loader.dll
+    touch $MYGOPATH/pkg/mod/github.com/wailsapp/wails/v3@${WAILS_VERSION}/internal/webview2/webviewloader/x86/WebView2Loader.dll
+    '''],
 ]
 
 [licensing]
@@ -10,19 +23,9 @@ exclude_files = [
     ]
 
 [[licensing.licenses]]
-path = "vendor/github.com/shirou/gopsutil/v3/LICENSE"
-sha256sum = "ad1e64b82c04fb2ee6bfe521bff01266971ffaa70500024d4ac767c6033aafb9"
-expression = "BSD-3-Clause"
-
-[[licensing.licenses]]
 path = "vendor/github.com/shirou/gopsutil/v4/LICENSE"
 sha256sum = "ad1e64b82c04fb2ee6bfe521bff01266971ffaa70500024d4ac767c6033aafb9"
 expression = "BSD-3-Clause"
-
-[[licensing.licenses]]
-path = "vendor/github.com/go-text/typesetting/LICENSE"
-sha256sum = "6b1bf94c77d7faa0ce94f8745595bfaf4c404f8b3873f5c2ce55ca15f8e44eca"
-expression = "(Unlicense AND BSD-3-Clause AND (Unlicense OR BSD-3-Clause)) AND BSD-3-Clause AND Unlicense"
 
 [[licensing.licenses]]
 path = "vendor/github.com/cloudflare/circl/LICENSE"
@@ -35,11 +38,6 @@ sha256sum = "8befb41eac649775143c81fddaf84b7d7e1197899d968b8b51cfec405f2ff72f"
 expression = "Apache-2.0"
 
 [[licensing.licenses]]
-path = "vendor/github.com/go-text/render/LICENSE"
-sha256sum = "6b1bf94c77d7faa0ce94f8745595bfaf4c404f8b3873f5c2ce55ca15f8e44eca"
-expression = "(Unlicense AND BSD-3-Clause AND (Unlicense OR BSD-3-Clause)) AND BSD-3-Clause AND Unlicense"
-
-[[licensing.licenses]]
 path = "vendor/gopkg.in/yaml.v3/LICENSE"
 sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
 expression = "MIT AND (MIT AND Apache-2.0)"
@@ -48,11 +46,6 @@ expression = "MIT AND (MIT AND Apache-2.0)"
 path = "vendor/github.com/miekg/dns/COPYRIGHT"
 sha256sum = "66550c0ad5ca7ec1e08683e5f872cc45c741f311eee3b8ee484206ecbf9c740d"
 expression = "BSD-3-Clause"
-
-[[licensing.licenses]]
-path = "vendor/github.com/jsummers/gobmp/COPYING.txt"
-sha256sum = "027529c1f33b6ef9280c5b9569e120734dbbee0e5e37436fb9a1bc7a0153b0ae"
-expression = "MIT"
 
 [[licensing.licenses]]
 path = "vendor/github.com/shopspring/decimal/LICENSE"
