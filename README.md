@@ -1,4 +1,4 @@
-[![Copr build status](https://copr.fedorainfracloud.org/coprs/jsbillings/netbird/package/netbird/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/jsbillings/netbird/package/netbird/)
+[![Copr build status](https://copr.devel.redhat.com/coprs/g/endpoint-systems-sysadmins/csb-fedora/package/netbird/status_image/last_build.png)](https://copr.devel.redhat.com/coprs/g/endpoint-systems-sysadmins/csb-fedora/package/netbird/)
 
 # Packaging netbird as a native Fedora Package
 
@@ -13,7 +13,7 @@
 - Install through COPR:
 
 ```
-    dnf copr enable jsbillings/netbird
+    dnf copr enable copr.devel.redhat.com/@endpoint-systems-sysadmins/csb-fedora
     dnf install netbird-client netbird-ui
 ```
 
@@ -22,6 +22,17 @@
     make srpm
 ```
 A .src.rpm package will be created.  You can then build that with rpmbuild or mock.
+
+## SELinux Support
+
+This package includes a `netbird-selinux` subpackage that provides a comprehensive SELinux policy module for security confinement. Without this policy, netbird runs in an unconfined domain with broad system access. The policy confines netbird to a restricted domain with only the permissions it needs:
+
+- WireGuard network interface management (kernel module or userspace TUN fallback)
+- DNS configuration (`/etc/resolv.conf`) modification
+- eBPF program loading for DNS forwarding and WireGuard proxy
+- Network operations and routing
+
+On SELinux-enabled systems (default for Fedora/RHEL), the policy is automatically installed with `netbird-client`, enhancing system security through mandatory access control. See [SELINUX_README.md](./SELINUX_README.md) for details.
 
 ## How to use Netbird
 

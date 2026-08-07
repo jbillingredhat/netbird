@@ -44,6 +44,7 @@ Source10:        netbird-ui-assets-%{version}.tgz
 Patch01:        Disable-client-version-update-for-Fedora-package.patch
 
 BuildRequires:  go-vendor-tools
+BuildRequires:  selinux-policy-devel
 BuildRequires:  libX11-devel, libXcursor-devel, libXrandr-devel, libglvnd-devel, libXinerama-devel, libXi-devel, libXxf86vm-devel
 BuildRequires:  systemd-rpm-macros
 # for hardlinks executable
@@ -58,6 +59,7 @@ MFA and granular access controls.
 %package client
 Summary: The netbird client command line tool and systemd service
 Requires: %{name} = %{version}-%{release}
+Requires: (%{name}-selinux = %{version}-%{release} if selinux-policy-targeted)
 
 %description client
 The netbird client includes the 'netbird' command line tool as well as
@@ -76,6 +78,9 @@ The graphical client used to run and manage your netbird connection.
 %goprep -A
 %setup -q -T -D -a1 %{forgesetupargs}
 %autopatch -p1
+
+# Copy SELinux policy files to build directory
+cp %{SOURCE7} %{SOURCE8} %{SOURCE9} .
 
 %generate_buildrequires
 %go_vendor_license_buildrequires -c %{SOURCE2}
@@ -155,6 +160,9 @@ hardlink --ignore-time %{buildroot}
 %systemd_user_postun_with_restart netbirdui.service
 %systemd_user_postun_with_reload netbirdui.service
 %systemd_user_postun netbirdui.service
+
+%pre selinux
+%selinux_relabel_pre -s %{selinuxtype}
 
 %files -f %{go_vendor_license_filelist}
 %license vendor/modules.txt
