@@ -9,11 +9,11 @@ srpm:
 	rm -rf /tmp/_topdir
 	mkdir -p /tmp/_topdir/SOURCES
 	rpmdev-spectool --gf $(spec)
-        # Go binaries
+	# Go binaries
 	export GOPATH=$(NETBIRD_GOPATH)
 	go_vendor_archive create --config go-vendor-tools.toml netbird.spec
 	# Extract netbird tarball to build NodeJS bits
-	tar zxvf netbird-$(NETBIRD_VERSION).tar.gz
+	tar zxf netbird-$(NETBIRD_VERSION).tar.gz
 	pushd netbird-$(NETBIRD_VERSION)
 	WAILS_VERSION=$$(go list -m -f '{{.Version}}' github.com/wailsapp/wails/v3)
 	go install github.com/wailsapp/wails/v3/cmd/wails3@$$WAILS_VERSION
