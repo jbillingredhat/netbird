@@ -1,21 +1,3 @@
-[archive]
-tidy = false
-pre_commands = [
-    ["bash", "-xeuo", "pipefail", "-c",
-    '''
-    MYGOPATH=$(go env GOPATH)
-    WAILS_VERSION=$(go list -m -f '{{.Version}}' github.com/wailsapp/wails/v3)
-    go mod tidy
-    chmod +rwx $MYGOPATH/pkg/mod/github.com/wailsapp/wails/v3@${WAILS_VERSION}/internal/webview2/webviewloader
-    mkdir -p $MYGOPATH/pkg/mod/github.com/wailsapp/wails/v3@${WAILS_VERSION}/internal/webview2/webviewloader/arm64
-    mkdir -p $MYGOPATH/pkg/mod/github.com/wailsapp/wails/v3@${WAILS_VERSION}/internal/webview2/webviewloader/x64
-    mkdir -p $MYGOPATH/pkg/mod/github.com/wailsapp/wails/v3@${WAILS_VERSION}/internal/webview2/webviewloader/x86
-    touch $MYGOPATH/pkg/mod/github.com/wailsapp/wails/v3@${WAILS_VERSION}/internal/webview2/webviewloader/arm64/WebView2Loader.dll
-    touch $MYGOPATH/pkg/mod/github.com/wailsapp/wails/v3@${WAILS_VERSION}/internal/webview2/webviewloader/x64/WebView2Loader.dll
-    touch $MYGOPATH/pkg/mod/github.com/wailsapp/wails/v3@${WAILS_VERSION}/internal/webview2/webviewloader/x86/WebView2Loader.dll
-    '''],
-]
-
 [licensing]
 detector = "askalono"
 exclude_files = [

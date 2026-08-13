@@ -1,10 +1,10 @@
-#NETBIRD_GOPATH := $(shell mktemp -d /tmp/gopathXXXX )
-NETBIRD_GOPATH := /tmp/netbird_go
+NETBIRD_GOPATH := $(shell mktemp -d /tmp/gopathXXXX )
 NETBIRD_VERSION := $(shell rpmspec -q --qf "%{VERSION}\n" netbird.spec | head -1)
 
 .ONESHELL:
 SHELL=/bin/bash
 srpm:
+	set -x
 	dnf install -y rpmdevtools rpmautospec go-vendor-tools python3-specfile golang-bin gtk4-devel webkitgtk6.0-devel pnpm git
 	rm -rf /tmp/_topdir
 	mkdir -p /tmp/_topdir/SOURCES
@@ -16,7 +16,7 @@ srpm:
 	tar zxf netbird-$(NETBIRD_VERSION).tar.gz
 	pushd netbird-$(NETBIRD_VERSION)
 	WAILS_VERSION=$$(go list -m -f '{{.Version}}' github.com/wailsapp/wails/v3)
-	go install github.com/wailsapp/wails/v3/cmd/wails3@$$WAILS_VERSION
+	go install github.com/wailsapp/wails/v3/cmd/wails3@$${WAILS_VERSION}
 	pushd client/ui
 	$(NETBIRD_GOPATH)/bin/wails3 generate bindings -clean=true -ts
 	pushd frontend
