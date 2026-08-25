@@ -5,6 +5,7 @@ After=network.target syslog.target
 
 [Service]
 EnvironmentFile=-/etc/sysconfig/netbird
+ExecStartPre=/usr/bin/rm -f /run/netbird.sock
 ExecStart=/usr/bin/netbird service run --log-level warn --daemon-addr unix:///run/netbird.sock --log-file /var/log/netbird/client.log
 
 Restart=always

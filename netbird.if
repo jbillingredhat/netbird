@@ -52,11 +52,11 @@ interface(`netbird_read_config',`
 #
 interface(`netbird_stream_connect',`
 	gen_require(`
-		type netbird_t, netbird_runtime_t;
+		type netbird_t, var_run_t;
 	')
 
 	files_search_pids($1)
-	stream_connect_pattern($1, netbird_runtime_t, netbird_runtime_t, netbird_t)
+	stream_connect_pattern($1, var_run_t, var_run_t, netbird_t)
 ')
 
 ########################################
@@ -80,7 +80,7 @@ interface(`netbird_admin',`
 	gen_require(`
 		type netbird_t, netbird_etc_t;
 		type netbird_var_lib_t, netbird_var_log_t;
-		type netbird_runtime_t;
+		type var_run_t;
 	')
 
 	allow $1 netbird_t:process { ptrace signal_perms };
@@ -96,5 +96,5 @@ interface(`netbird_admin',`
 	admin_pattern($1, netbird_var_log_t)
 
 	files_search_pids($1)
-	admin_pattern($1, netbird_runtime_t)
+	admin_pattern($1, var_run_t)
 ')

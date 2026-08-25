@@ -18,8 +18,8 @@ logging_log_file(netbird_var_log_t)
 type netbird_etc_t;
 files_config_file(netbird_etc_t)
 
-type netbird_runtime_t;
-files_pid_file(netbird_runtime_t)
+type var_run_t;
+files_pid_file(var_run_t)
 
 ########################################
 #
@@ -76,10 +76,10 @@ setattr_files_pattern(netbird_t, netbird_var_log_t, netbird_var_log_t)
 logging_log_filetrans(netbird_t, netbird_var_log_t, { dir file })
 
 # Allow netbird to manage its runtime files (unix socket)
-manage_dirs_pattern(netbird_t, netbird_runtime_t, netbird_runtime_t)
-manage_files_pattern(netbird_t, netbird_runtime_t, netbird_runtime_t)
-manage_sock_files_pattern(netbird_t, netbird_runtime_t, netbird_runtime_t)
-files_pid_filetrans(netbird_t, netbird_runtime_t, { dir file sock_file })
+manage_dirs_pattern(netbird_t, var_run_t, var_run_t)
+manage_files_pattern(netbird_t, var_run_t, var_run_t)
+manage_sock_files_pattern(netbird_t, var_run_t, var_run_t)
+files_pid_filetrans(netbird_t, var_run_t, { dir file sock_file })
 
 # Allow access to /dev/net/tun for userspace WireGuard fallback
 # Primary mode uses kernel WireGuard module (no TUN device needed)
