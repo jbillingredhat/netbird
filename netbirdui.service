@@ -1,9 +1,10 @@
 [Unit]
 Description=Netbird UI
+After=graphical-session.target
 
 [Service]
 Type=simple
 ExecStart=/usr/bin/netbird-ui
 
 [Install]
-WantedBy=graphical-session.target
+WantedBy=graphical.target
