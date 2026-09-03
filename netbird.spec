@@ -11,7 +11,7 @@
 
 # https://github.com/netbirdio/netbird
 %global goipath         github.com/netbirdio/netbird
-%global netbirdversion  0.77.1
+%global netbirdversion  0.78.0
 Version:                %{netbirdversion}
 
 %gometa -L -f
@@ -50,8 +50,6 @@ Source10:        netbird-ui-assets-%{version}.tgz
 # Local updates
 ## Disable the update client check for Fedora package
 Patch01:        Disable-client-version-update-for-Fedora-package.patch
-## Include fix for kernel panic caused by loopback XDP program #7303
-Patch02:        client-Revert-declaring-multi-buffer-support-for-the.patch
 
 BuildRequires:  go-vendor-tools
 BuildRequires:  selinux-policy-devel
