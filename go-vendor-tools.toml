@@ -44,3 +44,7 @@ path = "vendor/howett.net/plist/LICENSE"
 sha256sum = "20d9b7d9372369484ecadae229d3e3efee8029b259e11c9a1b07d2e0a3c82e39"
 expression = "BSD-2-Clause"
 
+[[licensing.licenses]]
+path = "vendor/go.yaml.in/yaml/v3/LICENSE"
+sha256sum = "d18f6323b71b0b768bb5e9616e36da390fbd39369a81807cca352de4e4e6aa0b"
+expression = "(MIT AND Apache-2.0)"

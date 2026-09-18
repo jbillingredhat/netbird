@@ -20,10 +20,8 @@ srpm:
 	pushd client/ui
 	$(NETBIRD_GOPATH)/bin/wails3 generate bindings -clean=true -ts
 	pushd frontend
-	# Fix broken dependencies
-	sed -i 's,"^10.0.1","^9.39.5",' package.json
 	# install the npm dependencies
-	pnpm install --frozen-lockfile
+	pnpm install
 	pnpm build
 	popd # frontend
 	popd # client/ui
