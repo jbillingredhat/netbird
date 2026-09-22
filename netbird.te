@@ -37,6 +37,13 @@ require {
 	type sssd_var_lib_t;
 	type virt_var_lib_t;
 	type iptables_t;
+	type config_home_t;
+	type user_home_dir_t;
+	type tmp_t;
+	class dir { add_name search write };
+	class file { create open read write };
+	class capability dac_read_search;
+
 }
 
 allow netbird_t self:capability { net_admin net_raw sys_admin };
@@ -73,6 +80,7 @@ manage_dirs_pattern(netbird_t, netbird_var_log_t, netbird_var_log_t)
 append_files_pattern(netbird_t, netbird_var_log_t, netbird_var_log_t)
 create_files_pattern(netbird_t, netbird_var_log_t, netbird_var_log_t)
 setattr_files_pattern(netbird_t, netbird_var_log_t, netbird_var_log_t)
+read_files_pattern(netbird_t, netbird_var_log_t, netbird_var_log_t)
 logging_log_filetrans(netbird_t, netbird_var_log_t, { dir file })
 
 # Allow netbird to manage its runtime files (unix socket)
@@ -194,3 +202,11 @@ allow netbird_t self:netlink_netfilter_socket create_socket_perms;
 
 # Logging
 logging_send_syslog_msg(netbird_t)
+
+# For netbird debug bundle
+allow netbird_t config_home_t:dir search;
+allow netbird_t user_home_dir_t:dir search;
+allow netbird_t self:capability dac_read_search;
+allow netbird_t tmp_t:dir { add_name write };
+allow netbird_t tmp_t:file { create open write };
+
