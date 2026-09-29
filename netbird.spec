@@ -59,6 +59,8 @@ BuildRequires:  systemd-rpm-macros
 BuildRequires:  util-linux-core
 # For building UI
 BuildRequires: webkitgtk6.0-devel, gtk4-devel, glib2-devel
+# Required for test compilation
+BuildRequires:  libpcap-devel
 
 %description
 Connect your devices into a secure WireGuard-based overlay network with SSO,
@@ -180,6 +182,68 @@ hardlink --ignore-time %{buildroot}
 
 %check
 %go_vendor_license_check -c %{SOURCE2}
+
+%if %{with check}
+# Tests that require networking, root privileges, or hardware
+# unavailable in the build sandbox.
+failing_tests=(
+  TestUpload
+  TestIptablesManager{,IPSet}
+  TestNftablesManager
+  Test{Ip,NF}tablesCreatePerformance\*
+  TestUpdate{OldManagementURL,DNSServer}\*
+  TestEngine_{SSH,Sync,MultiplePeers,UpdateNetworkMap}\*
+  TestDNSFakeResolverHandleUpdates
+  TestDNSPermanent_{update{HostDNS_emptyUpstream,Upstream},matchOnly}
+  TestManagerUpdateRoutes\*
+  TestWGIface_UpdateAddr
+  Test_{Create,Configure}Interface
+  Test_Close
+  Test_{Update,Remove}Peer
+  Test_ConnectPeers
+  TestPostgresql_{NewStore,{Save,Delete}Account,SavePeerStatus}
+  TestPostgresql_TestGetAccountByPrivateDomain
+  TestPostgresql_Get{TokenIDByHashedToken,UserByTokenID}
+  TestShould{ReadSTUNOnReadFrom,NotReadNonSTUNPackets}
+  TestWriteTo
+  TestSharedSocket_Close
+  Test{AddVPNRoute,AddRouteToNonVPNIntf,Routing}\*
+  TestUpstreamResolver_ServeDNS\*
+  TestGetNextHop
+  Test_NetAddresses
+  Test_ParseNATExternalIPMappings\*
+  TestRecreation\*
+  TestExistsInRouteTable
+  TestProxyCloseByRemoteConn
+  TestNetworkMonitor_Event
+  TestNetworkMonitor_MultiEvent
+  TestServiceLifecycle\*
+  TestUpDaemon
+  TestConnectWithRetryRuns
+  TestResolver_PartialUpdateReplacesOnlyUpdatedTypes
+  TestResolver_EmptyUpdateDoesNotRemoveDomains
+  TestResolver_PartialUpdateAddsNewTypePreservesExisting
+  TestServer_Up
+  TestProxyRedirect
+  TestSSHClient_CommandExecution
+  TestSSHClient_ContextCancellation
+  TestSSHProxy_Connect
+  TestPrivilegeDropper_CreateExecutorCommand
+  TestPrivilegeDropper_CreateExecutorCommandInteractive
+  TestJWTEnforcement/allows_when_disabled
+  TestJWTAuthentication
+  TestJWTDetection
+  TestICEBind_HandlesConcurrentMixedTraffic
+  TestRedirectAs_\*
+  TestSSHProxy_CommandQuoting
+  # Assumes Start()/NotifyUI() still notify in download-only mode when
+  # autoUpdateSupported() is false; Disable-client-version-update-for-Fedora-package.patch
+  # makes them return early instead, so this fails on Linux, not due to sandbox limits.
+  Test_LatestVersion_Linux
+)
+disable=$(echo ${failing_tests[*]} | sed 's/ /|/g')
+go test -mod=vendor -skip "${disable}" ./client/...
+%endif
 
 
 %post client
