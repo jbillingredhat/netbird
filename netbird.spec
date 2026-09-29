@@ -127,6 +127,11 @@ popd
 
 popd
 
+# Generate shell completions
+%{gobuilddir}/bin/client completion bash > netbird.bash
+%{gobuilddir}/bin/client completion zsh > _netbird
+%{gobuilddir}/bin/client completion fish > netbird.fish
+
 # Copy the client config into the build directory
 cp %{SOURCE4} .
 
@@ -159,6 +164,11 @@ install -m 0644 -vD %{SOURCE6} %{buildroot}%{_sysconfdir}/logrotate.d/netbird
 
 # client configration
 install -m 0755 -vd %{buildroot}%{_sysconfdir}/netbird
+
+# Shell completions
+install -m 0644 -vD netbird.bash %{buildroot}%{_datadir}/bash-completion/completions/netbird
+install -m 0644 -vD _netbird %{buildroot}%{_datadir}/zsh/site-functions/_netbird
+install -m 0644 -vD netbird.fish %{buildroot}%{_datadir}/fish/vendor_completions.d/netbird.fish
 
 # SELinux policy module
 install -m 0755 -vd %{buildroot}%{_datadir}/selinux/packages
@@ -233,6 +243,13 @@ fi
 %ghost %{_localstatedir}/log/netbird/client.log
 %{_sysconfdir}/logrotate.d/netbird
 %ghost %{_rundir}/netbird.sock
+%{_datadir}/bash-completion/completions/netbird
+%dir %{_datadir}/zsh
+%dir %{_datadir}/zsh/site-functions
+%{_datadir}/zsh/site-functions/_netbird
+%dir %{_datadir}/fish
+%dir %{_datadir}/fish/vendor_completions.d
+%{_datadir}/fish/vendor_completions.d/netbird.fish
 
 %files ui
 %{_bindir}/netbird-ui
