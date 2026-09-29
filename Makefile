@@ -3,6 +3,7 @@ NETBIRD_VERSION := $(shell rpmspec -q --qf "%{VERSION}\n" netbird.spec | head -1
 
 .ONESHELL:
 SHELL=/bin/bash
+.PHONY: srpm
 srpm:
 	set -ex
 ifneq ($(skip_deps),1)
