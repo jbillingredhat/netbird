@@ -13,5 +13,19 @@ RestartSec=120
 StartLimitInterval=5
 StartLimitBurst=10
 
+# Sandboxing
+# ProtectHome= and ProtectKernelTunables= are intentionally omitted:
+# - ProtectHome would break the debug bundle (needs home dir access)
+# - ProtectKernelTunables would break sysctl writes (ip_forward, rp_filter)
+PrivateDevices=true
+BindPaths=/dev/net/tun
+DeviceAllow=/dev/net/tun rw
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+RestrictRealtime=true
+
 [Install]
 WantedBy=multi-user.target
