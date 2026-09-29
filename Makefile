@@ -4,7 +4,7 @@ NETBIRD_VERSION := $(shell rpmspec -q --qf "%{VERSION}\n" netbird.spec | head -1
 .ONESHELL:
 SHELL=/bin/bash
 srpm:
-	set -x
+	set -ex
 	dnf install -y rpmdevtools rpmautospec go-vendor-tools python3-specfile golang-bin gtk4-devel webkitgtk6.0-devel pnpm git
 	rm -rf /tmp/_topdir
 	mkdir -p /tmp/_topdir/SOURCES
