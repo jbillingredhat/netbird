@@ -94,6 +94,11 @@ files_pid_filetrans(netbird_t, var_run_t, { dir file sock_file })
 # Fallback mode uses userspace WireGuard with TUN device
 corenet_rw_tun_tap_dev(netbird_t)
 
+# Allow the kernel to autoload the WireGuard netlink family
+# (kmod="net-pf-16-proto-16-family-wireguard") on first use.
+# Needs self:capability net_admin, already granted above.
+kernel_request_load_module(netbird_t)
+
 # Allow netbird to read and manage network configuration
 # This includes modifying /etc/resolv.conf when not using systemd-resolved
 sysnet_read_config(netbird_t)
